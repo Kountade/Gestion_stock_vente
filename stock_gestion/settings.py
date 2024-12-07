@@ -118,7 +118,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',  # Dossier static à la racine de votre projet
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # Dossier où les fichiers seront collectés lors du déploiement
-
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Fichiers médias
 MEDIA_URL = '/media/'  # URL pour accéder aux fichiers médias téléchargés
 MEDIA_ROOT = BASE_DIR / 'media'  # Dossier où les fichiers téléchargés seront stockés
