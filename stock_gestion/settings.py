@@ -16,7 +16,7 @@ SECRET_KEY = "django-insecure-fvnhzov(y)8$u^aj@99j&%j15vbof94xs$cx4c)74f#22@ni61
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["web-production-eac6.up.railway.app","127.0.0.1"]
 
 
 # Application definition
@@ -40,6 +40,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
