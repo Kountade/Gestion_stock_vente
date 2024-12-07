@@ -1,0 +1,161 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Liste des Livraisons</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Accueil</a></li>
+        <li class="breadcrumb-item">Livraisons</li>
+        <li class="breadcrumb-item active">Liste</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              Liste complète des livraisons. Vous pouvez rechercher, filtrer,
+              modifier ou supprimer.
+            </h5>
+            {% if messages %}
+            <div>
+              {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <p>
+              <button
+                type="button"
+                class="btn btn-success btn-lg"
+                onclick="window.location.href='{% url 'enregistrer_livraison' %}'"
+              >
+                <i class="ri-add-circle-fill"></i> Ajouter
+              </button>
+            </p>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th>Produit</th>
+                  <th>Fournisseur</th>
+                  <th>Quantité</th>
+                  <th>Prix Unitaire</th>
+                  <th>Total</th>
+                  <th>Total Global</th>
+                  <th>Date de Livraison</th>
+                  <th>Modifier</th>
+                  <th>Détails</th>
+                  <th>Supprimer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for livraison in livraisons %}
+                <tr>
+                  <td>{{ livraison.produit.produit }}</td>
+                  <td>{{ livraison.fournisseur.nom }}</td>
+                  <td>{{ livraison.quantite_commande }}</td>
+                  <td>{{ livraison.prix_unitaire }}</td>
+                  <td>{{ livraison.total }}</td>
+                  <td>{{ livraison.total_global }}</td>
+                  <td>{{ livraison.date_livraison|date:"d/m/Y" }}</td>
+
+                  <td>
+                    <a
+                      class="btn btn-outline-info"
+                      href="{% url 'modifier_livraison' livraison.id %}"
+                    >
+                      <i class="bi bi-pencil-square"></i> Modifier
+                    </a>
+                  </td>
+
+                  <!-- Button for Delivery Details -->
+                  <td>
+                    <a
+                      class="btn btn-outline-primary"
+                      href="{% url 'details_livraison' livraison.id %}"
+                    >
+                      <i class="bi bi-info-circle"></i> Détails
+                    </a>
+                  </td>
+
+                  <!-- Button trigger modal -->
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-outline-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteModal{{ livraison.id }}"
+                    >
+                      <i class="bi bi-trash"></i> Supprimer
+                    </a>
+                  </td>
+
+                  <!-- Modal -->
+                  <div
+                    class="modal fade"
+                    id="deleteModal{{ livraison.id }}"
+                    tabindex="-1"
+                    aria-labelledby="deleteModalLabel{{ livraison.id }}"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5
+                            class="modal-title"
+                            id="deleteModalLabel{{ livraison.id }}"
+                          >
+                            Confirmer la suppression
+                          </h5>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div class="modal-body">
+                          Êtes-vous sûr de vouloir supprimer cette livraison ?
+                          Cette action est irréversible.
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Annuler
+                          </button>
+
+                          <!-- Formulaire de suppression -->
+                          <form
+                            action="{% url 'supprimer_livraison' livraison.id %}"
+                            method="POST"
+                          >
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                              Oui, Supprimer
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

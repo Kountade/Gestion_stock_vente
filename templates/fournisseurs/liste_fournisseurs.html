@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% load static %} {%block content%}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Data Tables</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Accueil</a></li>
+        <li class="breadcrumb-item">Fournisseurs</li>
+        <li class="breadcrumb-item active">Liste</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+  
+
+  
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              Liste Complète des Fournisseurs. Vous pouvez faire des rechercher
+              filtre modifier ou supprimer
+            </h5>
+            <p>
+              <button
+                type="button"
+                class="btn btn-success btn-lg"
+                onclick="window.location.href='{% url 'ajouter_fournisseur' %}'"
+              >
+                <i class="ri-add-circle-fill"></i> Ajouter
+              </button>
+            </p>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th><b></b>Nom</th>
+                  <th>Email</th>
+                  <th>Téléphone</th>
+                  <th>Adresse</th>
+                  <th data-type="date" data-format="YYYY/DD/MM">Start Date</th>
+                  <th>Deatils</th>
+                  <th>Modifier</th>
+                  <th>Supprimer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for fournisseur in fournisseurs %}
+                <tr>
+                  <td>{{ fournisseur.nom }}</td>
+                  <td>{{ fournisseur.email }}</td>
+                  <td>{{ fournisseur.telephone }}</td>
+                  <td>{{ fournisseur.adresse }}</td>
+                  <td>{{ fournisseur.date_ajout|date:"d/m/Y" }}</td>
+                  <td>
+                    <a class="btn btn-outline-info" href="{% url 'modifier_fournisseur' fournisseur.id %}">
+                        <i class="bi bi-pencil-square"></i> Details
+                    </a>
+                </td>
+                    <td><a class="btn btn-outline-warning" href="{% url 'modifier_fournisseur' fournisseur.id %}">Modifer</td>
+                    <!-- Button trigger modal -->
+<td>
+  <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ fournisseur.id }}">
+      <i class="bi bi-trash"></i> Supprimer
+  </a>
+</td>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal{{ fournisseur.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ fournisseur.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel{{ fournisseur.id }}">Confirmer la suppression</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              Êtes-vous sûr de vouloir supprimer ce fournisseur ? Cette action est irréversible.
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+              
+              <!-- Formulaire de suppression -->
+              <form action="{% url 'supprimer_fournisseur' fournisseur.id %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Confimer</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- End #main -->
+{%endblock content%}

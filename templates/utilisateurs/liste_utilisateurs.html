@@ -1,0 +1,159 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Liste des Utilisateurs</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">Utilisateurs</li>
+        <li class="breadcrumb-item active">Liste</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              Liste complète des utilisateurs. Vous pouvez rechercher, filtrer,
+              modifier ou supprimer.
+            </h5>
+
+            {% if messages %}
+            <div>
+              {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <p>
+              <button
+                type="button"
+                class="btn btn-success btn-lg"
+                onclick="window.location.href='{% url 'ajouter_utilisateur' %}'"
+              >
+                <i class="ri-add-circle-fill"></i> Ajouter un Utilisateur
+              </button>
+            </p>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Rôle</th>
+                  <th>Statut</th>
+                  <th>Date d'inscription</th>
+                  <th>Modifier</th>
+                  <th>Détails</th>
+                  <th>Supprimer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for utilisateur in utilisateurs %}
+                <tr>
+                  <td>{{ utilisateur.nom }}</td>
+                  <td>{{ utilisateur.email }}</td>
+                  <td>{{ utilisateur.role }}</td>
+                  <td>{{ utilisateur.statut }}</td>
+                  <td>{{ utilisateur.date_inscription|date:"d/m/Y" }}</td>
+
+                  <td>
+                    <a
+                      class="btn btn-outline-info"
+                      href="{% url 'modifier_utilisateur' utilisateur.id %}"
+                    >
+                      <i class="bi bi-pencil-square"></i> Modifier
+                    </a>
+                  </td>
+
+                  <!-- Button for User Details -->
+                  <td>
+                    <a
+                      class="btn btn-outline-primary"
+                      href="{% url 'details_utilisateur' utilisateur.id %}"
+                    >
+                      <i class="bi bi-info-circle"></i> Détails
+                    </a>
+                  </td>
+
+                  <!-- Button trigger modal for Delete -->
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-outline-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteModal{{ utilisateur.id }}"
+                    >
+                      <i class="bi bi-trash"></i> Supprimer
+                    </a>
+                  </td>
+
+                  <!-- Modal for Deletion -->
+                  <div
+                    class="modal fade"
+                    id="deleteModal{{ utilisateur.id }}"
+                    tabindex="-1"
+                    aria-labelledby="deleteModalLabel{{ utilisateur.id }}"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5
+                            class="modal-title"
+                            id="deleteModalLabel{{ utilisateur.id }}"
+                          >
+                            Confirmer la suppression
+                          </h5>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div class="modal-body">
+                          Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+                          Cette action est irréversible.
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Annuler
+                          </button>
+
+                          <!-- Formulaire de suppression -->
+                          <form
+                            action="{% url 'supprimer_utilisateur' utilisateur.id %}"
+                            method="POST"
+                          >
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                              Oui, Supprimer
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

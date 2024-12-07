@@ -1,0 +1,139 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Data Tables</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item">Tables</li>
+        <li class="breadcrumb-item active">Data</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              Liste Complète des Clients. Vous pouvez rechercher, filtrer,
+              modifier ou supprimer.
+            </h5>
+            <p>
+              <button
+                type="button"
+                class="btn btn-success btn-lg"
+                onclick="window.location.href='{% url 'ajouter_client' %}'"
+              >
+                <i class="ri-add-circle-fill"></i> Ajouter
+              </button>
+            </p>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Prénoms</th>
+                  <th>Email</th>
+                  <th>Téléphone</th>
+                  <th>Adresse</th>
+                  <th data-type="date" data-format="YYYY/MM/DD">
+                    Date d'ajout
+                  </th>
+                  <th>Modifier</th>
+                  <th>Supprimer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for client in clients %}
+                <tr>
+                  <td>{{ client.nom }}</td>
+                  <td>{{ client.prenom }}</td>
+                  <td>{{ client.email }}</td>
+                  <td>{{ client.telephone }}</td>
+                  <td>{{ client.adresse }}</td>
+                  <td>{{ client.date_creation|date:"d/m/Y" }}</td>
+                  <td>
+                    <a
+                      class="btn btn-outline-info"
+                      href="{% url 'modifier_client' client.id %}"
+                    >
+                      <i class="bi bi-pencil-square"></i> Modifier
+                    </a>
+                  </td>
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-outline-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteModal{{ client.id }}"
+                    >
+                      <i class="bi bi-trash"></i> Supprimer
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- Modal -->
+                <div
+                  class="modal fade"
+                  id="deleteModal{{ client.id }}"
+                  tabindex="-1"
+                  aria-labelledby="deleteModalLabel{{ client.id }}"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5
+                          class="modal-title"
+                          id="deleteModalLabel{{ client.id }}"
+                        >
+                          Confirmer la suppression
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div class="modal-body">
+                        Êtes-vous sûr de vouloir supprimer ce client ? Cette
+                        action est irréversible.
+                      </div>
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal"
+                        >
+                          Annuler
+                        </button>
+                        <form
+                          action="{% url 'supprimer_client' client.id %}"
+                          method="POST"
+                        >
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger">
+                            Oui, Supprimer
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- End #main -->
+{% endblock content %}

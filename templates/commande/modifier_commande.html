@@ -1,0 +1,37 @@
+{% extends "base.html" %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Modifier la commande d'approvisionnement</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">Commandes d'approvisionnement</li>
+        <li class="breadcrumb-item active">Modifier</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Formulaire de modification</h5>
+            <form method="POST">
+              {% csrf_token %} {{ form.as_p }}
+              <div class="text-center">
+                <button type="submit" class="btn btn-success">
+                  Enregistrer les modifications
+                </button>
+                <a href="{% url 'liste_commandes' %}" class="btn btn-secondary"
+                  >Annuler</a
+                >
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Enregistrer une Livraison</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">Livraisons</li>
+        <li class="breadcrumb-item active">Nouvelle Livraison</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Formulaire d'Enregistrement</h5>
+
+            <!-- Multi Columns Form -->
+            <form method="POST" class="row g-3">
+              {% load crispy_forms_tags %} {% csrf_token %} {{ form|crispy }}
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">
+                  <i class="bi bi-check-circle"></i> Enregistrer
+                </button>
+                <button type="reset" class="btn btn-secondary btn-lg">
+                  <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+                </button>
+              </div>
+            </form>
+            <!-- End Multi Columns Form -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- End #main -->
+{% endblock content %}

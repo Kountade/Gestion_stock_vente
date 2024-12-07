@@ -1,0 +1,109 @@
+{% extends "base.html" %}{% load static %} {% block content %}
+<main id="main" class="main">
+  <!-- Titre de la page -->
+  <div class="pagetitle">
+    <h1>Facture de vente #{{ vente.id }}</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'liste_ventes' %}">Ventes</a>
+        </li>
+        <li class="breadcrumb-item active">Détails</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card">
+          <div class="card-body">
+            <!-- En-tête de la facture -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h2 class="fw-bold">FACTURE</h2>
+                <p><strong>Numéro :</strong> {{ vente.id }}</p>
+                <p><strong>Date :</strong> {{ vente.date|date:"d/m/Y H:i" }}</p>
+              </div>
+              <div class="text-end">
+                <img
+                  src="{% static 'assets/img/logo.png' %}"
+                  alt="Logo"
+                  style="width: 120px"
+                />
+                <p><strong>Votre entreprise</strong></p>
+                <p>Adresse de l'entreprise</p>
+                <p>Téléphone : +212 6 12 34 56 78</p>
+                <p>Email : info@votreentreprise.com</p>
+              </div>
+            </div>
+
+            <!-- Informations sur le client -->
+            <div class="mb-4">
+              <h5 class="fw-bold">Informations du client</h5>
+              <p>
+                <strong>Nom :</strong> {{ vente.client.nom }} {{vente.client.prenom }}
+              </p>
+              <p><strong>Adresse :</strong> {{ vente.client.adresse }}</p>
+              <p><strong>Téléphone :</strong> {{ vente.client.telephone }}</p>
+              <p><strong>Email :</strong> {{ vente.client.email }}</p>
+            </div>
+
+            <!-- Produits vendus -->
+            <h5 class="fw-bold mt-4">Détails des produits</h5>
+            <table class="table table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th>Produit</th>
+                  <th>Quantité</th>
+                  <th>Prix unitaire (€)</th>
+                  <th>Total (€)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for produit_vendu in produits_vendus %}
+                <tr>
+                  <td>{{ produit_vendu.produit.nom }}</td>
+                  <td>{{ produit_vendu.quantite }}</td>
+                  <td>{{ produit_vendu.prix_unitaire|floatformat:2 }}</td>
+                  <td>{{ produit_vendu.total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+            <!-- Totaux de la facture -->
+            <div class="row justify-content-end">
+              <div class="col-md-6">
+                <table class="table table-bordered">
+                  <tr>
+                    <th>Sous-total</th>
+                    <td class="text-end">{{ vente_total|floatformat:2 }} €</td>
+                  </tr>
+                  <tr class="table-success">
+                    <th>Total à payer</th>
+                    <td class="text-end fw-bold">
+                      {{ vente_total|floatformat:2 }} €
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'liste_ventes' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Retour à la liste
+              </a>
+              <button class="btn btn-primary" onclick="window.print()">
+                <i class="bi bi-printer"></i> Imprimer la facture
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

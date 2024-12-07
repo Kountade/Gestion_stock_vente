@@ -1,0 +1,142 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+
+<main id="main" class="main">
+  <!-- En-tête de l'entreprise -->
+  <div class="pagetitle">
+    <h1>Devis de Livraison</h1>
+  </div>
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <!-- Carte de devis -->
+        <div class="card">
+          <div class="card-body">
+            <!-- En-tête de l'entreprise -->
+            <div class="d-flex justify-content-between mb-4">
+              <div>
+                <h2 class="fw-bold">Galsenshop</h2>
+                <p>
+                  Adresse de l'entreprise<br />
+                  Téléphone : +212 620-983-827<br />
+                  Email : techsinformatique@gmail.com
+                </p>
+              </div>
+              <div>
+                <img
+                  src="{% static 'assets/img/logo.png' %}"
+                  alt="Logo"
+                  style="max-width: 120px"
+                />
+              </div>
+            </div>
+
+            <!-- Informations du client -->
+            <div class="mb-4">
+              <h3 class="fw-bold">Informations du Client</h3>
+              <p>
+                <strong>Nom du Client :</strong> {{ livraison.client.nom }}<br />
+                <strong>Adresse :</strong> {{ livraison.client.adresse }}<br />
+                <strong>Téléphone :</strong> {{ livraison.client.telephone }}<br />
+                <strong>Email :</strong> {{ livraison.client.email }}
+              </p>
+            </div>
+
+            <!-- Détails de la livraison -->
+            <h3 class="fw-bold">Détails de la Livraison</h3>
+            <table class="table table-bordered mt-3">
+              <thead class="table-light">
+                <tr>
+                  <th>Référence</th>
+                  <th>Produit</th>
+                  <th>Fournisseur</th>
+                  <th>Quantité</th>
+                  <th>Prix Unitaire</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ livraison.id }}</td>
+                  <td>{{ livraison.produit.produit }}</td>
+                  <td>{{ livraison.produit.fournisseur.nom }}</td>
+                  <td>{{ livraison.quantite_commande }}</td>
+                  <td>{{ livraison.prix_unitaire }} MAD</td>
+                  <td>{{ livraison.total }} MAD</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="5" class="text-end">Total Global</th>
+                  <th>{{ livraison.total_global }} MAD</th>
+                </tr>
+              </tfoot>
+            </table>
+
+            <!-- Informations supplémentaires -->
+            <div class="mt-4">
+              <h3 class="fw-bold">Informations Supplémentaires</h3>
+              <table class="table table-bordered">
+                <tr>
+                  <th>Date de Livraison</th>
+                  <td>{{ livraison.date_livraison|date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                  <th>Date de Commande</th>
+                  <td>{{ livraison.produit.date_commande|date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                  <th>Différence en Jours</th>
+                  <td>{{ livraison.difference_jours }} jours</td>
+                </tr>
+                <tr>
+                  <th>Status</th>
+                  <td>{{ livraison.produit.get_statut_display }}</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Signature et cachet -->
+            <div class="mt-5 d-flex justify-content-between">
+              <div>
+                <p><strong>Signature du Fournisseur</strong></p>
+                <p>____________________________</p>
+              </div>
+              <div>
+                <p><strong>Cachet de l'Entreprise</strong></p>
+                <p>____________________________</p>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="mt-5 d-flex justify-content-end">
+              <a
+                href="{% url 'liste_livraisons' %}"
+                class="btn btn-secondary me-2"
+              >
+                <i class="bi bi-arrow-left-circle"></i> Retour à la liste
+              </a>
+              <a
+                href="#"
+                class="btn btn-success me-2"
+                onclick="window.print();"
+              >
+                <i class="bi bi-printer"></i> Imprimer
+              </a>
+              <a
+                href="{% url 'modifier_livraison' livraison.id %}"
+                class="btn btn-info"
+              >
+                <i class="bi bi-pencil-square"></i> Modifier
+              </a>
+            </div>
+          </div>
+          <!-- Fin card-body -->
+        </div>
+        <!-- Fin card -->
+      </div>
+    </div>
+  </section>
+</main>
+
+{% endblock %}

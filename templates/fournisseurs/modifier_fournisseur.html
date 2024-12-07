@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Modifier Fournisseur</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'liste_fournisseurs' %}">Fournisseurs</a>
+        </li>
+        <li class="breadcrumb-item active">Modifier Fournisseur</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Modifier les informations du fournisseur</h5>
+
+            <!-- Formulaire de modification -->
+            <form method="POST" class="row g-3">
+              {% load crispy_forms_tags %} {% csrf_token %} {{ form|crispy }}
+              <!-- Affiche le formulaire avec crispy form -->
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">
+                  <i class="bi bi-check-circle"></i> Modifier
+                </button>
+                <a
+                  href="{% url 'liste_fournisseurs' %}"
+                  class="btn btn-secondary btn-lg"
+                >
+                  <i class="bi bi-arrow-counterclockwise"></i> Annuler
+                </a>
+              </div>
+            </form>
+            <!-- End Formulaire de modification -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock content %}

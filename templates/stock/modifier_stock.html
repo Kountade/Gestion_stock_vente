@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Modifier un Stock</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'liste_stocks' %}">Stock</a>
+        </li>
+        <li class="breadcrumb-item active">Modifier</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Formulaire de modification d'un stock</h5>
+
+            <!-- Formulaire de modification -->
+            <form method="POST" class="row g-3">
+              {% load crispy_forms_tags %} {% csrf_token %} {{ form|crispy }}
+              <!-- Affiche le formulaire avec crispy forms -->
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">
+                  <i class="bi bi-check-circle"></i> Enregistrer les
+                  modifications
+                </button>
+                <a
+                  href="{% url 'liste_stocks' %}"
+                  class="btn btn-secondary btn-lg"
+                >
+                  <i class="bi bi-arrow-left-circle"></i> Retour
+                </a>
+                <button type="reset" class="btn btn-secondary btn-lg">
+                  <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+                </button>
+              </div>
+            </form>
+            <!-- Fin du formulaire de modification -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock content %}

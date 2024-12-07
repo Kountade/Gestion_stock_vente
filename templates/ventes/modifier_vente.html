@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Modifier la vente #{{ vente.id }}</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'liste_ventes' %}">Ventes</a></li>
+        <li class="breadcrumb-item active">Modifier</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Formulaire de modification de vente</h5>
+            <form method="POST" class="row g-3">
+              {% csrf_token %}
+              
+              <!-- Client -->
+              <div class="form-group">
+                <label for="client">Client</label>
+                <select id="client" name="client" class="form-select" required>
+                  <option value="" disabled>-- Sélectionnez un client --</option>
+                  {% for client in clients %}
+                  <option value="{{ client.id }}" {% if client == vente.client %}selected{% endif %}>
+                    {{ client.nom }} {{ client.prenom }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            
+              <!-- Produits -->
+              <h3>Produits</h3>
+              <table id="produits-table" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Produit</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for produit_vendu in vente.ventes_produits.all %}
+                  <tr>
+                    <td>
+                      <select name="produit[]" class="form-select" required>
+                        <option value="" disabled>-- Produit --</option>
+                        {% for produit in produits %}
+                        <option value="{{ produit.id }}" {% if produit == produit_vendu.produit %}selected{% endif %}>
+                          {{ produit.nom }} - {{ produit.prix }} €
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </td>
+                    <td>
+                      <input type="number" name="quantite[]" class="form-control" value="{{ produit_vendu.quantite }}" min="1" required />
+                    </td>
+                    <td>
+                      <input type="text" name="prix[]" class="form-control" value="{{ produit_vendu.prix_unitaire }}" required />
+                    </td>
+                    <td>
+                      <button type="button" class="btn btn-danger delete-row">Supprimer</button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+              <!-- Statut Paiement -->
+              <div class="form-group">
+                <label>Statut du paiement</label><br>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="statut_paiement" id="payee" value="payee" {% if vente.statut_paiement == 'payee' %}checked{% endif %}>
+                  <label class="form-check-label" for="payee">Payée</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="statut_paiement" id="non_payee" value="non_payee" {% if vente.statut_paiement == 'non_payee' %}checked{% endif %}>
+                  <label class="form-check-label" for="non_payee">Non Payée</label>
+                </div>
+              </div>
+            
+              <div class="text-center">
+                <button type="button" id="add-row" class="btn btn-primary btn-lg">
+                  <i class="bi bi-plus-circle"></i> Ajouter un produit
+                </button>
+                <button type="submit" class="btn btn-success btn-lg">
+                  <i class="bi bi-check-circle"></i> Modifier la vente
+                </button>
+                <a href="{% url 'liste_ventes' %}" class="btn btn-secondary btn-lg">
+                  <i class="bi bi-arrow-left-circle"></i> Retour
+                </a>
+              </div>
+            </form>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    var addRowButton = document.getElementById("add-row");
+    var produitsTable = document
+      .getElementById("produits-table")
+      .querySelector("tbody");
+
+    addRowButton.addEventListener("click", function () {
+      var newRow = produitsTable.insertRow();
+      newRow.innerHTML = `
+        <td>
+          <select name="produit[]" class="form-select" required>
+            <option value="" disabled selected>-- Produit --</option>
+            {% for produit in produits %}
+            <option value="{{ produit.id }}">{{ produit.nom }} - {{ produit.prix }} €</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td><input type="number" name="quantite[]" class="form-control" min="1" required /></td>
+        <td><input type="text" name="prix[]" class="form-control" required /></td>
+        <td><button type="button" class="btn btn-danger delete-row">Supprimer</button></td>
+      `;
+    });
+
+    produitsTable.addEventListener("click", function (e) {
+      if (e.target && e.target.classList.contains("delete-row")) {
+        e.target.closest("tr").remove();
+      }
+    });
+  });
+</script>
+{% endblock %}

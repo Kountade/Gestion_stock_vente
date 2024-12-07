@@ -1,0 +1,77 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Contrats</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">employes</li>
+        <li class="breadcrumb-item active">contrats</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">liste contrats des employes</h5>
+
+            <div class="mt-4">
+              {% for item in progress_list %}
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">{{item.contrat.employe.nom}}</h5>
+                  <p>
+                    <strong>Type de Contrat :</strong>
+                    {{item.contrat.type_contrat}}
+                  </p>
+                  <p>
+                    <strong>Date de début :</strong>{{item.contrat.date_debut}}
+                  </p>
+                  <p>
+                    <strong>Date de fin :</strong> {{ item.contrat.date_fin }}
+                  </p>
+
+                  <!-- Progress bar -->
+                  <div class="progress mt-3">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      style="width: {{ item.progress }}%;"
+                      aria-valuenow="{{ item.progress }}"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      {{ item.progress|floatformat:0 }}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {% empty %}
+              <p>Aucun contrat trouvé.</p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Alerts Massages contrats</h5>
+            <!-- Affichage des notifications dans le menu -->
+            <div class="notifications">
+              {% for message in messages %}
+              <div class="alert alert-info">{{ message }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock content %}

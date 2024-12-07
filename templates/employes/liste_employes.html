@@ -1,0 +1,150 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Liste des Employés</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">Tables</li>
+        <li class="breadcrumb-item active">Employés</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              Liste complète des employés. Vous pouvez effectuer des recherches,
+              modifier ou supprimer.
+            </h5>
+            <p>
+              <button
+                type="button"
+                class="btn btn-success btn-lg"
+                onclick="window.location.href='{% url 'ajouter_employe' %}'"
+              >
+                <i class="ri-add-circle-fill"></i> Ajouter
+              </button>
+            </p>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Prénom</th>
+                  <th>Email</th>
+                  <th>Téléphone</th>
+                  <th>Rôle</th>
+                  <th>Date Embauche</th>
+                  <th>Actif</th>
+                  <th>Modifier</th>
+                  <th>Supprimer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for employe in employes %}
+                <tr>
+                  <td>{{ employe.nom }}</td>
+                  <td>{{ employe.prenom }}</td>
+                  <td>{{ employe.email }}</td>
+                  <td>{{ employe.telephone }}</td>
+                  <td>{{ employe.get_role_display }}</td>
+                  <td>{{ employe.date_embauche|date:"d/m/Y" }}</td>
+                  <td>
+                    <span
+                      class="badge {% if employe.actif %}bg-success{% else %}bg-danger{% endif %} fs-5"
+                    >
+                      {% if employe.actif %}
+                      <i class="bi bi-check-circle"></i> Actif {% else %}
+                      <i class="bi bi-x-circle"></i> Inactif {% endif %}
+                    </span>
+                  </td>
+
+                  <td>
+                    <a
+                      class="btn btn-outline-info"
+                      href="{% url 'modifier_employe' employe.id %}"
+                    >
+                      <i class="bi bi-pencil-square"></i> Modifier
+                    </a>
+                  </td>
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-outline-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteModal{{ employe.id }}"
+                    >
+                      <i class="bi bi-trash"></i> Supprimer
+                    </a>
+                  </td>
+
+                  <!-- Modal -->
+                  <div
+                    class="modal fade"
+                    id="deleteModal{{ employe.id }}"
+                    tabindex="-1"
+                    aria-labelledby="deleteModalLabel{{ employe.id }}"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5
+                            class="modal-title"
+                            id="deleteModalLabel{{ employe.id }}"
+                          >
+                            Confirmer la suppression
+                          </h5>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div class="modal-body">
+                          Êtes-vous sûr de vouloir supprimer cet employé ? Cette
+                          action est irréversible.
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Annuler
+                          </button>
+
+                          <!-- Formulaire de suppression -->
+                          <form
+                            action="{% url 'supprimer_employe' employe.id %}"
+                            method="POST"
+                          >
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                              Oui, Supprimer
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- End #main -->
+{% endblock content %}

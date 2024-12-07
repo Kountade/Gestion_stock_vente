@@ -1,0 +1,202 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Liste des Ventes</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="breadcrumb-item">Ventes</li>
+        <li class="breadcrumb-item active">Liste</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- Titre et Boutons d'exportation -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="card-title">Ventes réalisées</h5>
+              <div>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary me-2"
+                  onclick="window.location.href='{% url 'exporter_excel' %}'"
+                >
+                  <i class="bi bi-file-earmark-spreadsheet"></i> Exporter Excel
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#pdfOptions"
+                >
+                  <i class="bi bi-file-earmark-pdf"></i> Générer PDF
+                </button>
+              </div>
+            </div>
+
+            <!-- Formulaire pour Options PDF -->
+            <div id="pdfOptions" class="collapse mb-3">
+              <form
+                id="pdfConfigForm"
+                method="get"
+                action="{% url 'exporter_pdf' %}"
+              >
+                <div class="mb-3">
+                  <label for="ventes_count" class="form-label"
+                    >Nombre de ventes à afficher :</label
+                  >
+                  <input
+                    type="number"
+                    id="ventes_count"
+                    name="ventes_count"
+                    value="3"
+                    min="1"
+                    max="100"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="form-check mb-3">
+                  <input
+                    type="checkbox"
+                    id="only_paid"
+                    name="only_paid"
+                    class="form-check-input"
+                  />
+                  <label class="form-check-label" for="only_paid"
+                    >Afficher uniquement les ventes payées</label
+                  >
+                </div>
+
+                <button type="submit" class="btn btn-outline-danger mt-3">
+                  <i class="bi bi-file-earmark-pdf"></i> Générer PDF
+                </button>
+              </form>
+            </div>
+            {% if messages %}
+            <div>
+              {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <!-- Bouton Ajouter une Vente -->
+            <button
+              type="button"
+              class="btn btn-success btn-lg mb-3"
+              onclick="window.location.href='{% url 'ajouter_vente' %}'"
+            >
+              <i class="ri-add-circle-fill"></i> Ajouter une vente
+            </button>
+
+            <!-- Table des ventes -->
+            <table
+              class="table table-striped table-bordered table-hover datatable"
+            >
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Produits</th>
+                  <th>Total</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Modifier</th>
+                  <th>Supprimer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vente in ventes %}
+                <tr>
+                  <td>{{ vente.client.nom }} {{ vente.client.prenom }}</td>
+                  <td>
+                    {% for ligne in vente.lignes.all %}
+                    <div>
+                      {{ ligne.produit.nom }} ({{ ligne.quantite }} unités)
+                    </div>
+                    {% endfor %}
+                  </td>
+                  <td>{{ vente.total|floatformat:0 }} CFA</td>
+                  <td>{{ vente.date }}</td>
+                  <td>
+                    <span
+                      class="badge {% if vente.status == 'payée' %}bg-success{% else %}bg-warning{% endif %} fs-5"
+                    >
+                      {% if vente.status == 'payée' %}
+                      <i class="bi bi-check-circle"></i> Payée {% else %}
+                      <i class="bi bi-clock"></i> En attente {% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    <a class="btn btn-outline-info" href="#">
+                      <i class="bi bi-pencil-square"></i> Modifier
+                    </a>
+                  </td>
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-outline-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteModal{{ vente.id }}"
+                    >
+                      <i class="bi bi-trash"></i> Supprimer
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de confirmation de suppression -->
+  {% for vente in ventes %}
+  <div
+    class="modal fade"
+    id="deleteModal{{ vente.id }}"
+    tabindex="-1"
+    aria-labelledby="deleteModalLabel{{ vente.id }}"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel{{ vente.id }}">
+            Confirmer la suppression
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Fermer"
+          ></button>
+        </div>
+        <div class="modal-body">
+          Êtes-vous sûr de vouloir supprimer cette vente ? Cette action est
+          irréversible.
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Annuler
+          </button>
+          <form action="#" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Oui, Supprimer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</main>
+{% endblock content %}

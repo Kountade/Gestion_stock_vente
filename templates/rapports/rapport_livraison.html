@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<main id="main" class="main">
+  <!-- Page Title -->
+  <div class="pagetitle">
+    <h1>Graphes des Livraisions</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Accueil</a></li>
+        <li class="breadcrumb-item">Livraisions</li>
+        <li class="breadcrumb-item active">Graphes</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- End Page Title -->
+
+  <!-- Introduction -->
+
+  <!-- Charts Section -->
+  <section class="section">
+    <div class="row">
+      <!-- Pie Chart Card -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              Pourcentage % de livraison par fournisseur
+            </h5>
+
+            <!-- Chart Container -->
+            <div id="pieChart"></div>
+
+            <!-- Chart Script -->
+            <script>
+              document.addEventListener("DOMContentLoaded", () => {
+                // Fetch data from the backend
+                const labels = {{ labels|safe }};  // Convert Python list to JSON
+                const series = {{ series|safe }};  // Convert Python list to JSON
+
+                // Initialize the chart
+                new ApexCharts(document.querySelector("#pieChart"), {
+                  series: series,
+                  chart: {
+                    height: 350,
+                    type: 'pie',
+                    toolbar: {
+                      show: true
+                    }
+                  },
+                  labels: labels
+                }).render();
+              });
+            </script>
+          </div>
+        </div>
+      </div>
+      <!-- End Pie Chart Card -->
+    </div>
+  </section>
+  <!-- End Charts Section -->
+</main>
+{% endblock content %}
