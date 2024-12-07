@@ -17,6 +17,11 @@ SECRET_KEY = "django-insecure-fvnhzov(y)8$u^aj@99j&%j15vbof94xs$cx4c)74f#22@ni61
 DEBUG = True
 
 ALLOWED_HOSTS = ["web-production-eac6.up.railway.app","127.0.0.1"]
+CSRF_COOKIE_SECURE = True  # CSRF cookie enabled only Https server
+CSRF_COOKIE_HTTPONLY = True  # CSRF stored in http only cookie
+CSRF_TESTED_ORIGINS = [
+    "http://localhost:8000"
+]
 
 
 # Application definition
