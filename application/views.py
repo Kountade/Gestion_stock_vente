@@ -18,7 +18,7 @@ from django.utils import timezone
 
 def home(request):
     # Période par défaut : Aujourd'hui
-    period = request.GET.get('period', 'day')  # Récupérer la période, par défaut 'day'
+    period = request.GET.get('period', 'day')
 
     # Exemple de données fictives, remplacez-les par les calculs réels
     if period == 'day':
@@ -51,7 +51,7 @@ def home(request):
     # Calcul du nombre total de produits vendus
     total_produits_vendus = VenteProduit.objects.aggregate(
         total=Sum('quantite')
-    )['total'] or 0  # Si aucune vente, retourne 0
+    )['total'] or 0
 
     # Calcul des produits vendus par catégorie
     categories = Categorie.objects.annotate(
@@ -84,16 +84,17 @@ def home(request):
         .order_by('-action_time')[:5]
 
     context = {
-        'data_graph': data_graph,  # Passer les données du graphique
+        'data_graph': data_graph,
         'data_categories': data_categories,
         'total_produits_vendus': total_produits_vendus,
         'total_clients': total_clients,
-        'top_products': top_products,  # Ajouter les produits les plus vendus avec leur revenu
-        'recent_actions': recent_actions,  # Passer les actions récentes au contexte
-        'recent_sales': recent_sales,  # Passer les dernières ventes au contexte
+        'top_products': top_products,  # Les 5 derniers produits
+        'recent_actions': recent_actions,
+        'recent_sales': recent_sales,
     }
 
     return render(request, 'index.html', context)
+
 
 def report_view(request):
     # Obtention de la date actuelle
@@ -917,7 +918,6 @@ from django.contrib import messages
 from .forms import ProfileUpdateForm, UserUpdateForm
 
 @login_required
-@login_required
 def profile_edit(request):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
@@ -957,6 +957,9 @@ def rapport_livraison_view(request):
         'series': series,
     }
     return render(request, 'rapports/rapport_livraison.html', context)
+
+
+
 
     
 # PDF excel  produits
