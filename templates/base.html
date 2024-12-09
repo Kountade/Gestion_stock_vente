@@ -295,8 +295,8 @@
               class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
             >
               <li class="dropdown-header">
-                <h6>Kevin Anderson</h6>
-                <span>Web Designer</span>
+                <h6>  {{ user.first_name }} {{ user.last_name }}</h6>
+                <span>admin</span>
               </li>
               <li>
                 <hr class="dropdown-divider" />
@@ -636,7 +636,7 @@
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="#">
-            <i class="bi bi-card-list"></i>
+            <i class="bi bi-person-plus"></i>
             <span>Utilisateurs</span>
           </a>
         </li>
@@ -644,6 +644,12 @@
           <a class="nav-link collapsed" href="{% url 'ajouter_utilisateur' %}">
             <i class="bi bi-card-list"></i>
             <span>Register</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="{% url 'Logout' %}">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
           </a>
         </li>
         <!-- End Register Page Nav -->

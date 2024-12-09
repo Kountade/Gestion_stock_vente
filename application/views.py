@@ -16,6 +16,11 @@ from django.db.models import Sum
 from datetime import datetime
 from django.utils import timezone
 
+from django.shortcuts import render
+from django.db.models import Sum, F
+from django.contrib.admin.models import LogEntry
+from .models import Client, Vente, VenteProduit, Categorie, Produit
+
 def home(request):
     # Période par défaut : Aujourd'hui
     period = request.GET.get('period', 'day')
@@ -45,6 +50,11 @@ def home(request):
         "customers": customers,
     }
 
+    # ⚙️ Calcul du total des ventes
+    total_ventes = Vente.objects.aggregate(
+        total=Sum(F('ventes_produits__quantite') * F('ventes_produits__prix_unitaire'))
+    )['total'] or 0  # Retourne 0 si la somme est None
+
     # Calcul du nombre total des clients
     total_clients = Client.objects.count()
 
@@ -66,7 +76,7 @@ def home(request):
         }
         for cat in categories
     ]
-    
+
     # Récupérer les 5 produits les plus vendus
     top_products = Produit.objects.annotate(total_sold=Sum('venteproduit__quantite')) \
         .order_by('-total_sold')[:5]
@@ -91,6 +101,7 @@ def home(request):
         'top_products': top_products,  # Les 5 derniers produits
         'recent_actions': recent_actions,
         'recent_sales': recent_sales,
+        'total_ventes': total_ventes,  # ✅ Total des ventes
     }
 
     return render(request, 'index.html', context)
