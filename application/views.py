@@ -15,9 +15,10 @@ from django.shortcuts import render
 from django.db.models import Sum
 from datetime import datetime
 from django.utils import timezone
-
-from django.shortcuts import render
-from django.db.models import Sum, F
+from django.http import HttpResponse, Http404
+from weasyprint import HTML
+from django.template.loader import render_to_string
+from .models import Livraison  # Remplacez par le modèle approprié
 from django.contrib.admin.models import LogEntry
 from .models import Client, Vente, VenteProduit, Categorie, Produit
 
@@ -1106,3 +1107,22 @@ def generer_pdf(request):
 # PDF excel  produits
 
 #############################################################################################
+def generate_delivery_note_pdf(request, livraison_id):
+    try:
+        # Récupérer l'objet Livraison à partir de l'ID
+        livraison = Livraison.objects.get(id=livraison_id)
+    except Livraison.DoesNotExist:
+        # Lever une exception 404 si la Livraison n'existe pas
+        raise Http404("Livraison not found")
+
+    # Rendre le template HTML avec les données de la livraison
+    html_content = render_to_string('livraisons/livraison_pdf_template.html', {'livraison': livraison})
+
+    # Générer le PDF à partir du contenu HTML
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    # Retourner le PDF en réponse HTTP
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="bon_de_livraison_{livraison_id}.pdf"'
+    
+    return response

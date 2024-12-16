@@ -96,6 +96,8 @@ urlpatterns = [
      path('report/', views.report_view, name='report'),
      
      path('rapport-livraison/', views.rapport_livraison_view, name='rapport_livraison'),
+     path('livraison/pdf/<int:livraison_id>/', views.generate_delivery_note_pdf, name='generate_delivery_note_pdf'),
+
 
    
    # path('utilisateur/<int:pk>/supprimer/', views.supprimer_utilisateur, name='supprimer_utilisateur'),

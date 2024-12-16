@@ -1,0 +1,313 @@
+{% load static %}
+
+<div class="container" style="width: 100%; font-size: 16px;">
+  <!-- Conteneur principal avec une largeur plus grande -->
+  <div class="container-lg" style="display: flex; justify-content: center;">
+    <div class="row" style="width: 130%; max-width: 1000px;">
+      <div class="col-lg-12">
+        <!-- En-tête -->
+        <div style="background-color: #34b7f1; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px;">
+          <img src="{% static 'img/logo.png' %}" alt="Logo" style="height: 40px;">
+          <h1 style="color: white; font-size: 24px; font-weight: bold; text-align: center; flex-grow: 1; margin: 0;">
+            Bon de livraision
+          </h1>
+          <div></div>
+        </div>
+
+        <!-- Carte de la facture -->
+        <div class="card" style="border: 1px solid #ddd; box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1); margin-top: 20px;">
+          <div class="card-body" style="padding: 30px;">
+            
+            <!-- Table pour afficher les informations du fournisseur et de Galsenshop -->
+            <table class="table table-bordered" style="font-size: 16px; border-collapse: collapse;">
+              <thead style="background-color: #34b7f1; color: #fff; text-align: center;">
+                <tr>
+                  <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Informations du Fournisseur</th>
+                  <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Informations de Galsenshop</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding: 12px; border: 1px solid #ddd; text-align: left;">
+                    <strong>Nom :</strong>{{ livraison.produit.fournisseur.nom }}<br />
+                    <strong>Contact :</strong>{{ livraison.produit.fournisseur.telephone }}<br />
+                    <strong>Email :</strong>{{ livraison.produit.fournisseur.email|truncatechars:10 }}<br />
+                    <strong>Adresse :</strong>{{ livraison.produit.fournisseur.adresse|truncatechars:15 }}
+                  </td>
+                  <td style="padding: 12px; border: 1px solid #ddd; text-align: left;" >
+                    <strong>Nom de l'entreprise :</strong> Galsenshop<br />
+                    <strong>Adresse de l'entreprise :</strong> Adresse de l'entreprise<br />
+                    <strong>Téléphone :</strong> +212 620-983-827<br />
+                    <strong>Email :</strong> techsinformatique@gmail.com
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Détails de la livraison avec bordure rouge -->
+            <div
+              style="
+                border: 2px solid #f44336;
+                border-radius: 5px;
+                padding: 20px;
+                margin-top: 30px;
+              "
+            >
+              <h4
+                style="
+                  font-size: 20px;
+                  font-weight: bold;
+                  color: #f44336;
+                  text-align: center;
+                  border-bottom: 2px solid #f44336;
+                  padding-bottom: 10px;
+                  margin-bottom: 20px;
+                "
+              >
+                Détails de la Livraison
+              </h4>
+              <table
+                class="table table-bordered mt-3"
+                style="
+                  font-size: 16px;
+                  border-collapse: collapse;
+                  text-align: center;
+                "
+              >
+                <thead style="background-color: #ffebee; color: #f44336">
+                  <tr>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Référence
+                    </th>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Produit
+                    </th>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Quantité Commandée
+                    </th>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Quantité Livrée
+                    </th>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Statut
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                      {{ livraison.id }}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.produit.produit.produit }}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.produit.quantite }}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.quantite_commande }}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.produit.get_statut_display }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            
+
+
+
+            <!-- Informations Supplémentaires avec bordure -->
+            <div
+              style="
+                border: 2px solid #4caf50;
+                border-radius: 5px;
+                padding: 20px;
+                margin-top: 30px;
+              "
+            >
+              <h4
+                style="
+                  font-size: 20px;
+                  font-weight: bold;
+                  color: #4caf50;
+                  text-align: center;
+                  border-bottom: 2px solid #4caf50;
+                  padding-bottom: 10px;
+                  margin-bottom: 20px;
+                "
+              >
+                Informations Supplémentaires
+              </h4>
+              <table
+                class="table table-bordered mt-3"
+                style="
+                  font-size: 16px;
+                  border-collapse: collapse;
+                  text-align: center;
+                "
+              >
+                <thead style="background-color: #8bc34a; color: #fff">
+                  <tr>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Date de Livraison
+                    </th>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Date de Commande
+                    </th>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                      Statut de la Commande
+                    </th>
+                    <th style="padding: 12px; border: 1px solid #ddd">
+                        Durée de la Commande
+                      </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.date_livraison|date:"d/m/Y" }}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.produit.date_commande|date:"d/m/Y" }}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.produit.get_statut_display }}
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd">
+                        {{ livraison.difference_jours }} jours
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Signature et cachet -->
+            <table
+              class="table table-bordered"
+              style="font-size: 16px; border-collapse: collapse"
+            >
+              <thead
+                style="
+                  background-color: #34b7f1;
+                  color: #fff;
+                  text-align: center;
+                "
+              >
+                <tr>
+                  <th
+                    style="
+                      padding: 12px;
+                      border: 1px solid #ddd;
+                      text-align: left;
+                    "
+                  >
+                    Signature du Fournisseur
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      border: 1px solid #ddd;
+                      text-align: left;
+                    "
+                  >
+                    Signature de Galsenshop
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    style="
+                      padding: 12px;
+                      border: 1px solid #ddd;
+                      text-align: center;
+                    "
+                  >
+                    <div
+                      style="width: 45%; text-align: center; padding-top: 40px"
+                    >
+                      ________________________________
+                    </div>
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border: 1px solid #ddd;
+                      text-align: center;
+                    "
+                  >
+                    <div
+                      style="width: 45%; text-align: center; padding-top: 40px"
+                    >
+                      _________________________________
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Boutons d'action -->
+            <div class="mt-4 d-flex justify-content-end">
+              <a
+                href="{% url 'liste_livraisons' %}"
+                class="btn btn-secondary me-2"
+                style="font-size: 16px"
+              >
+                <i class="bi bi-arrow-left-circle"></i> Retour
+              </a>
+              <a
+                href="#"
+                class="btn btn-success me-2"
+                style="font-size: 16px"
+                onclick="window.print();"
+              >
+                <i class="bi bi-printer"></i> Imprimer
+              </a>
+              <a
+                href="{% url 'modifier_livraison' livraison.id %}"
+                class="btn btn-info"
+                style="font-size: 16px"
+              >
+                <i class="bi bi-pencil-square"></i> Modifier
+              </a>
+            </div>
+          </div>
+          <!-- Fin card-body -->
+        </div>
+        <!-- Fin card -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Style pour l'impression -->
+<style>
+  @media print {
+    .navbar,
+    .pagetitle,
+    header,
+    footer,
+    .btn {
+      display: none;
+    }
+    main {
+      padding: 0;
+    }
+    .card {
+      border: 1px solid #ddd;
+      box-shadow: none;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .table th,
+    .table td {
+      padding: 10px;
+    }
+    .d-flex {
+      display: block;
+    }
+  }
+</style>
