@@ -32,15 +32,6 @@
             </div>
 
             <!-- Informations du client -->
-            <div class="mb-4">
-              <h3 class="fw-bold">Informations du Client</h3>
-              <p>
-                <strong>Nom du Client :</strong> {{ livraison.client.nom }}<br />
-                <strong>Adresse :</strong> {{livraison.client.adresse}}<br />
-                <strong>Téléphone :</strong> {{ livraison.client.telephone }}<br />
-                <strong>Email :</strong> {{ livraison.client.email }}
-              </p>
-            </div>
 
             <!-- Détails de la livraison -->
             <h3 class="fw-bold">Détails de la Livraison</h3>
@@ -82,7 +73,7 @@
                   <td>{{ livraison.date_livraison|date:"d/m/Y" }}</td>
                 </tr>
                 <tr>
-                  <th>Date de Commande</th>
+                  <th>Date de commande</th>
                   <td>{{ livraison.produit.date_commande|date:"d/m/Y" }}</td>
                 </tr>
                 <tr>
