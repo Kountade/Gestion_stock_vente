@@ -14,6 +14,7 @@ gunicorn==23.0.0
 openpyxl==3.1.5
 packaging==24.2
 pillow==10.4.0
+pycairo==1.27.0
 pycparser==2.22
 pydyf==0.11.0
 pyphen==0.15.0

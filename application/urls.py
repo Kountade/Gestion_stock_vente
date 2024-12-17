@@ -46,12 +46,14 @@ urlpatterns = [
     
     # Livrasion
      # Page d'accueil
-    path('livraisons/', views.liste_livraisons, name='liste_livraisons'),  # Liste des livraisons
+    path('livraison/', views.liste_livraisons, name='liste_livraisons'),  # Liste des livraisons
     path('livraison/create/', views.enregistrer_livraison, name='enregistrer_livraison'),  # Créer une livraison
     path('livraison/<int:pk>/', views.details_livraison, name='details_livraison'), 
     # Détails d'une livraison
     path('livraison/<int:pk>/update/', views.modifier_livraison, name='modifier_livraison'),  # Modifier une livraison
     path('livraison/<int:pk>/delete/', views.supprimer_livraison, name='supprimer_livraison'),  # Supprimer une livraison
+     path('livraison/pdf/<int:livraison_id>/', views.generate_delivery_note_pdf, name='generate_delivery_note_pdf'),
+
     # clients
     path('clients/', views.liste_clients, name='liste_clients'),
     path('clients/ajouter/', views.ajouter_client, name='ajouter_client'),
@@ -96,8 +98,7 @@ urlpatterns = [
      path('report/', views.report_view, name='report'),
      
      path('rapport-livraison/', views.rapport_livraison_view, name='rapport_livraison'),
-     path('livraison/pdf/<int:livraison_id>/', views.generate_delivery_note_pdf, name='generate_delivery_note_pdf'),
-
+    
 
    
    # path('utilisateur/<int:pk>/supprimer/', views.supprimer_utilisateur, name='supprimer_utilisateur'),
