@@ -1164,6 +1164,16 @@ from django.db.models import Sum, F
 from .models import Vente
 
 
+# views.py
+from django.shortcuts import get_object_or_404, redirect
+from django.core.mail import EmailMessage
+from django.contrib import messages
+from django.template.loader import render_to_string
+from django.db.models import Sum, F
+from django.http import JsonResponse
+from .models import Vente
+import base64
+
 def send_delivery_vente_email(request, vente_id):
     """Vue pour envoyer le bon de livraison au client par e-mail"""
     # 1️⃣ Récupérer la vente
@@ -1174,44 +1184,57 @@ def send_delivery_vente_email(request, vente_id):
     for produit_vendu in produits_vendus:
         produit_vendu.total = produit_vendu.quantite * produit_vendu.prix_unitaire
 
-    # 3️⃣ Calcul du total global de la vente (sommes des totaux de chaque produit)
+    # 3️⃣ Calcul du total global de la vente
     vente_total = produits_vendus.aggregate(
         total=Sum(F('quantite') * F('prix_unitaire'))
     )['total'] or 0
 
-    # 4️⃣ Rendre le contenu HTML du PDF
-    html_content = render_to_string('ventes/vente_pdf_template.html', {  
+    # 4️⃣ Rendre le template HTML (qui contiendra le JS pour générer le PDF)
+    return render(request, 'ventes/vente_pdf_template.html', {
         "vente": vente,
         "produits_vendus": produits_vendus,
         "vente_total": vente_total,
     })
 
-    # 5️⃣ Générer le PDF
-    pdf_file = HTML(string=html_content).write_pdf()
+def send_pdf_email_api(request):
+    """API endpoint pour recevoir le PDF généré et l'envoyer par email"""
+    if request.method == 'POST':
+        try:
+            # 1️⃣ Récupérer les données
+            vente_id = request.POST.get('vente_id')
+            pdf_data = request.POST.get('pdf_data')
+            vente = get_object_or_404(Vente, pk=vente_id)
+            
+            # 2️⃣ Décoder le PDF
+            pdf_content = base64.b64decode(pdf_data.split(',')[1])
 
-    # 6️⃣ Informations sur l'e-mail
-    subject = f"Bonjour merci pour votre achat. voici votre facture n°{vente.id}"
-    message = f"Veuillez trouver en pièce jointe le bon de livraison pour la vente n°{vente.id}."
-    from_email = 'bounamakountagoudiaby@gmail.com'  # Remplacez par votre adresse e-mail
-    recipient_list = [vente.client.email]  # Assurez-vous que le client a un champ email
+            # 3️⃣ Préparer l'email
+            subject = f"Bonjour merci pour votre achat. voici votre facture n°{vente.id}"
+            message = f"Veuillez trouver en pièce jointe le bon de livraison pour la vente n°{vente.id}."
+            
+            email = EmailMessage(
+                subject=subject,
+                body=message,
+                from_email='bounamakountagoudiaby@gmail.com',
+                to=[vente.client.email],
+            )
 
-    # 7️⃣ Création de l'objet EmailMessage
-    email = EmailMessage(
-        subject=subject,
-        body=message,
-        from_email=from_email,
-        to=recipient_list,
-    )
+            # 4️⃣ Attacher le PDF
+            email.attach(
+                f'facture_de_vente_{vente.id}.pdf', 
+                pdf_content, 
+                'application/pdf'
+            )
 
-    # 8️⃣ Ajouter le fichier PDF en pièce jointe
-    email.attach(f'facture_de_vente_{vente.id}.pdf', pdf_file, 'application/pdf')
+            # 5️⃣ Envoyer l'email
+            email.send()
+            
+            return JsonResponse({'success': True})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Méthode non autorisée'})
 
-    # 9️⃣ Envoi de l'e-mail
-    try:
-        email.send()
-        messages.success(request, f"L'e-mail a été envoyé avec succès au client {vente.client.email}.")
-    except Exception as e:
-        messages.error(request, f"Erreur lors de l'envoi de l'e-mail : {e}")
 
-    # 🔟 Redirection après l'envoi (redirection correcte avec le pk)
-    return redirect('detail_vente', pk=vente.id)  # Redirigez vers la page de détail de la vente
+

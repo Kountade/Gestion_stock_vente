@@ -70,7 +70,8 @@ urlpatterns = [
     path('ventes/modifier/<int:pk>/', views.modifier_vente, name='modifier_vente'),
     path('vente/<int:pk>/supprimer/', views.supprimer_vente, name='supprimer_vente'),
     path('vente/pdf/<int:vente_id>/', views.generate_delivery_vente_pdf, name='generate_delivery_vente_pdf'),
-    path('vente/<int:vente_id>/envoyer-email/', send_delivery_vente_email, name='send_delivery_vente_email'),
+    path('vente/<int:vente_id>/send-email/', views.send_delivery_vente_email, name='send_delivery_vente_email'),
+    path('api/send-pdf-email/', views.send_pdf_email_api, name='send_pdf_email_api'),
 
 
     
