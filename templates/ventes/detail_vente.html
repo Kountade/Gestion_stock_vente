@@ -1,4 +1,7 @@
-{% extends "base.html" %}{% load static %} {% block content %}
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
 <main id="main" class="main">
   <!-- Titre de la page -->
   <div class="pagetitle">
@@ -6,19 +9,28 @@
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
-        <li class="breadcrumb-item">
-          <a href="{% url 'liste_ventes' %}">Ventes</a>
-        </li>
+        <li class="breadcrumb-item"><a href="{% url 'liste_ventes' %}">Ventes</a></li>
         <li class="breadcrumb-item active">Détails</li>
       </ol>
     </nav>
   </div>
 
   <section class="section">
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
+    <div class="d-flex justify-content-center">
+      <div class="col-lg-8">
         <div class="card">
           <div class="card-body">
+            {% if messages %}
+              <div class="container mt-3">
+                {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
             <!-- En-tête de la facture -->
             <div class="d-flex justify-content-between align-items-center mb-4">
               <div>
@@ -27,11 +39,7 @@
                 <p><strong>Date :</strong> {{ vente.date|date:"d/m/Y H:i" }}</p>
               </div>
               <div class="text-end">
-                <img
-                  src="{% static 'assets/img/logo.png' %}"
-                  alt="Logo"
-                  style="width: 120px"
-                />
+                <img src="{% static 'assets/img/logo.png' %}" alt="Logo" style="width: 120px" />
                 <p><strong>Votre entreprise</strong></p>
                 <p>Adresse de l'entreprise</p>
                 <p>Téléphone : +212 6 12 34 56 78</p>
@@ -42,9 +50,7 @@
             <!-- Informations sur le client -->
             <div class="mb-4">
               <h5 class="fw-bold">Informations du client</h5>
-              <p>
-                <strong>Nom :</strong> {{ vente.client.nom }} {{vente.client.prenom }}
-              </p>
+              <p><strong>Nom :</strong> {{ vente.client.nom }} {{ vente.client.prenom }}</p>
               <p><strong>Adresse :</strong> {{ vente.client.adresse }}</p>
               <p><strong>Téléphone :</strong> {{ vente.client.telephone }}</p>
               <p><strong>Email :</strong> {{ vente.client.email }}</p>
@@ -83,9 +89,7 @@
                   </tr>
                   <tr class="table-success">
                     <th>Total à payer</th>
-                    <td class="text-end fw-bold">
-                      {{ vente_total|floatformat:2 }} €
-                    </td>
+                    <td class="text-end fw-bold">{{ vente_total|floatformat:2 }} €</td>
                   </tr>
                 </table>
               </div>
@@ -96,14 +100,68 @@
               <a href="{% url 'liste_ventes' %}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left-circle"></i> Retour à la liste
               </a>
-              <button class="btn btn-primary" onclick="window.print()">
-                <i class="bi bi-printer"></i> Imprimer la facture
-              </button>
+              <a href="{% url 'generate_delivery_vente_pdf' vente.id %}" class="btn btn-outline-success me-2" target="_blank">
+                <i class="bi bi-eye"></i> Voir la facture
+              </a>
+              <a href="{% url 'send_delivery_vente_email' vente.id %}" class="btn btn-primary">
+                <i class="bi bi-envelope"></i> Envoyer par email
+              </a>
             </div>
+            
+
           </div>
         </div>
       </div>
     </div>
   </section>
 </main>
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const exportBtn = document.getElementById('pdf-export-btn');
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', generatePDF);
+  }
+
+  function generatePDF() {
+    const element = document.querySelector('.card');
+    const options = {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight
+    };
+
+    exportBtn.innerHTML = '<i class="bi bi-hourglass"></i> Génération en cours...';
+    exportBtn.disabled = true;
+
+    html2canvas(element, options).then(canvas => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`facture_vente_{{ vente.id }}.pdf`);
+
+      exportBtn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Exporter en PDF';
+      exportBtn.disabled = false;
+    }).catch(err => {
+      console.error("Erreur lors de la génération du PDF:", err);
+      exportBtn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Erreur - Réessayer';
+      exportBtn.disabled = false;
+    });
+  }
+});
+</script>
+{% endblock %}
 {% endblock %}

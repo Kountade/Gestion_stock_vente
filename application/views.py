@@ -16,7 +16,6 @@ from django.db.models import Sum
 from datetime import datetime
 from django.utils import timezone
 from django.http import HttpResponse, Http404
-from weasyprint import HTML
 from django.template.loader import render_to_string
 from .models import Livraison  # Remplacez par le modèle approprié
 from django.contrib.admin.models import LogEntry
@@ -1108,6 +1107,8 @@ def generer_pdf(request):
 
 #############################################################################################
 def generate_delivery_note_pdf(request, livraison_id):
+    
+    
     try:
         # Récupérer l'objet Livraison à partir de l'ID
         livraison = Livraison.objects.get(id=livraison_id)
@@ -1126,3 +1127,91 @@ def generate_delivery_note_pdf(request, livraison_id):
     response['Content-Disposition'] = f'inline; filename="bon_de_livraison_{livraison_id}.pdf"'
     
     return response
+
+
+# views.py
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
+from django.db.models import Sum, F
+from .models import Vente
+
+def generate_delivery_vente_pdf(request, vente_id):
+    # Récupération des données
+    vente = get_object_or_404(Vente, pk=vente_id)
+    produits_vendus = vente.ventes_produits.all()
+
+    # Calcul des totaux
+    for produit_vendu in produits_vendus:
+        produit_vendu.total = produit_vendu.quantite * produit_vendu.prix_unitaire
+
+    vente_total = produits_vendus.aggregate(
+        total=Sum(F('quantite') * F('prix_unitaire'))
+    )['total'] or 0
+
+    # Renvoie le template HTML (qui contiendra le JS pour la conversion PDF)
+    return render(request, 'ventes/vente_pdf_template.html', {
+        "vente": vente,
+        "produits_vendus": produits_vendus,
+        "vente_total": vente_total,
+    })
+
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.http import HttpResponse, Http404
+from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
+from django.db.models import Sum, F
+from .models import Vente
+
+
+def send_delivery_vente_email(request, vente_id):
+    """Vue pour envoyer le bon de livraison au client par e-mail"""
+    # 1️⃣ Récupérer la vente
+    vente = get_object_or_404(Vente, pk=vente_id)
+    produits_vendus = vente.ventes_produits.all()
+
+    # 2️⃣ Calcul du total de chaque vente de produit
+    for produit_vendu in produits_vendus:
+        produit_vendu.total = produit_vendu.quantite * produit_vendu.prix_unitaire
+
+    # 3️⃣ Calcul du total global de la vente (sommes des totaux de chaque produit)
+    vente_total = produits_vendus.aggregate(
+        total=Sum(F('quantite') * F('prix_unitaire'))
+    )['total'] or 0
+
+    # 4️⃣ Rendre le contenu HTML du PDF
+    html_content = render_to_string('ventes/vente_pdf_template.html', {  
+        "vente": vente,
+        "produits_vendus": produits_vendus,
+        "vente_total": vente_total,
+    })
+
+    # 5️⃣ Générer le PDF
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    # 6️⃣ Informations sur l'e-mail
+    subject = f"Bonjour merci pour votre achat. voici votre facture n°{vente.id}"
+    message = f"Veuillez trouver en pièce jointe le bon de livraison pour la vente n°{vente.id}."
+    from_email = 'bounamakountagoudiaby@gmail.com'  # Remplacez par votre adresse e-mail
+    recipient_list = [vente.client.email]  # Assurez-vous que le client a un champ email
+
+    # 7️⃣ Création de l'objet EmailMessage
+    email = EmailMessage(
+        subject=subject,
+        body=message,
+        from_email=from_email,
+        to=recipient_list,
+    )
+
+    # 8️⃣ Ajouter le fichier PDF en pièce jointe
+    email.attach(f'facture_de_vente_{vente.id}.pdf', pdf_file, 'application/pdf')
+
+    # 9️⃣ Envoi de l'e-mail
+    try:
+        email.send()
+        messages.success(request, f"L'e-mail a été envoyé avec succès au client {vente.client.email}.")
+    except Exception as e:
+        messages.error(request, f"Erreur lors de l'envoi de l'e-mail : {e}")
+
+    # 🔟 Redirection après l'envoi (redirection correcte avec le pk)
+    return redirect('detail_vente', pk=vente.id)  # Redirigez vers la page de détail de la vente

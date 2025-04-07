@@ -1,0 +1,344 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture #{{ vente.id }}</title>
+    <style>
+        /* Styles généraux */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* Styles des cartes */
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: #34b7f1;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .card-footer {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+        
+        /* Styles des tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        /* Styles spécifiques */
+        .client-card {
+            border: 1px solid #34b7f1;
+        }
+        
+        .produits-card {
+            border: 2px solid #4caf50;
+        }
+        
+        .infos-card {
+            border: 2px solid #f44336;
+        }
+        
+        .signature-area {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #000;
+            padding-top: 40px;
+            width: 45%;
+            text-align: center;
+        }
+        
+        /* Boutons (ne s'affichent pas dans l'impression/PDF) */
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        /* Styles pour l'impression */
+        @media print {
+            .no-print, .no-print * {
+                display: none !important;
+            }
+            
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                width: 100%;
+            }
+            
+            .card-header {
+                border-radius: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Carte principale contenant toute la facture -->
+        <div class="card">
+            <!-- En-tête -->
+            <div class="card-header" style="display: flex; align-items: center;">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" style="height: 50px">
+                <div style="flex-grow: 1; text-align: center;">
+                    <h1 style="margin: 0; font-size: 24px;">Facture d'achat #{{ vente.id }}</h1>
+                </div>
+            </div>
+            
+            <!-- Corps de la facture -->
+            <div class="card-body">
+                <!-- Section Informations client/entreprise -->
+                <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                    <!-- Carte Client -->
+                    <div class="card client-card" style="flex: 1;">
+                        <div class="card-header">Informations du client</div>
+                        <div class="card-body">
+                            <p><strong>Nom Prénom :</strong> {{ vente.client.nom }} {{vente.client.prenom }}</p>
+                            <p><strong>Contact :</strong> {{vente.client.telephone }}</p>
+                            <p><strong>Email :</strong> {{ vente.client.email }}</p>
+                            <p><strong>Adresse :</strong> {{vente.client.adresse }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Carte Entreprise -->
+                    <div class="card client-card" style="flex: 1;">
+                        <div class="card-header">Informations de Galsenshop</div>
+                        <div class="card-body">
+                            <p><strong>Nom de l'entreprise :</strong> Galsenshop</p>
+                            <p><strong>Adresse :</strong> Adresse de l'entreprise</p>
+                            <p><strong>Téléphone :</strong> +212 620-983-827</p>
+                            <p><strong>Email :</strong> techsinformatique@gmail.com</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section Produits -->
+             <!-- Section Produits avec style harmonisé -->
+<div class="card" style="border: 2px solid #4CAF50; border-radius: 5px; margin-bottom: 20px;">
+  <!-- En-tête vert comme "Informations supplémentaires" -->
+  <div class="card-header" style="background-color: #4CAF50; color: white; padding: 12px; text-align: center;">
+      <h3 style="margin: 0; font-weight: bold;">DÉTAILS DES PRODUITS</h3>
+  </div>
+  
+  <div class="card-body" style="padding: 0;">
+      <table style="width: 100%; border-collapse: collapse;">
+          <!-- En-têtes de colonnes comme "Informations du client" -->
+          <thead style="background-color: #34B7F1; color: white;">
+              <tr>
+                  <th style="padding: 12px; text-align: left; font-weight: bold; border-right: 1px solid #2A9FD8;">Produit</th>
+                  <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #2A9FD8;">Quantité</th>
+                  <th style="padding: 12px; text-align: right; font-weight: bold; border-right: 1px solid #2A9FD8;">Prix unitaire (cfa)</th>
+                  <th style="padding: 12px; text-align: right; font-weight: bold;">Total (cfa)</th>
+              </tr>
+          </thead>
+          
+          <tbody>
+              {% for produit_vendu in produits_vendus %}
+              <tr>
+                  <td style="padding: 10px; border-bottom: 1px solid #E0E0E0;">{{ produit_vendu.produit.nom }}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #E0E0E0; text-align: center;">{{ produit_vendu.quantite }}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #E0E0E0; text-align: right;">{{ produit_vendu.prix_unitaire|floatformat:2 }}</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #E0E0E0; text-align: right;">{{ produit_vendu.total|floatformat:2 }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+          
+          <!-- Pied de tableau comme "Informations supplémentaires" -->
+          <tfoot style="background-color: #4CAF50; color: white;">
+              <tr>
+                  <td colspan="3" style="padding: 12px; text-align: right; font-weight: bold;">TOTAL GLOBAL</td>
+                  <td style="padding: 12px; text-align: right; font-weight: bold;">{{ vente_total|floatformat:2 }} cfa</td>
+              </tr>
+          </tfoot>
+      </table>
+  </div>
+</div>
+                
+                <!-- Section Informations supplémentaires -->
+                <div class="card infos-card">
+                    <div class="card-header" style="background-color: #f44336; text-align: center;">
+                        Informations supplémentaires
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <table>
+                            <thead style="background-color: #ffebee; color: #f44336;">
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Date et heure</th>
+                                    <th>Statut client</th>
+                                    <th>Vendeur</th>
+                                    <th>Statut paiement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ vente.id }}</td>
+                                    <td>{{ vente.date|date:"d/m/Y H:i" }}</td>
+                                    <td>Satisfait</td>
+                                    <td>Non spécifique</td>
+                                    <td>{{vente.statut_paiement}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Section Signatures -->
+                <div class="signature-area">
+                    <div class="signature-line">
+                        Signature du client
+                    </div>
+                    <div class="signature-line">
+                        Signature Galsenshop
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pied de page -->
+            <div class="card-footer">
+                <p style="margin: 0; color: #6c757d;">
+                    Galsenshop • Adresse de l'entreprise • Tél: +212 620-983-827 • Email: techsinformatique@gmail.com
+                </p>
+                <p style="margin: 5px 0 0; color: #6c757d; font-size: 14px;">
+                    Facture générée le {% now "d/m/Y à H:i" %}
+                </p>
+            </div>
+        </div>
+        
+        <!-- Boutons d'action (ne s'affichent pas dans l'impression/PDF) -->
+        <div class="action-buttons no-print">
+            <a href="{% url 'liste_livraisons' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Retour
+            </a>
+            <button id="pdf-export-btn" class="btn btn-success">
+                <i class="bi bi-file-earmark-pdf"></i> Exporter PDF
+            </button>
+            <a href="#" onclick="window.print();" class="btn btn-primary">
+                <i class="bi bi-printer"></i> Imprimer
+            </a>
+            <a href="{% url 'modifier_vente' vente.id %}" class="btn btn-info">
+                <i class="bi bi-pencil-square"></i> Modifier
+            </a>
+        </div>
+    </div>
+
+    <!-- Script pour l'export PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+    document.getElementById('pdf-export-btn').addEventListener('click', function() {
+        // On cible uniquement la carte principale (sans les boutons)
+        const element = document.querySelector('.card');
+        const button = this;
+        button.innerHTML = '<i class="bi bi-hourglass"></i> Génération...';
+        button.disabled = true;
+        
+        html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            logging: false
+        }).then(canvas => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            pdf.save('facture_{{ vente.id }}.pdf');
+            button.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Exporter PDF';
+            button.disabled = false;
+        }).catch(error => {
+            console.error("Erreur lors de la génération du PDF:", error);
+            button.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Erreur';
+            setTimeout(() => {
+                button.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Exporter PDF';
+                button.disabled = false;
+            }, 2000);
+        });
+    });
+    </script>
+</body>
+</html>

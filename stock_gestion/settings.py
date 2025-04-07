@@ -1,5 +1,19 @@
 from pathlib import Path
 import os
+import sys
+
+# Désactive les messages de GIO/GLib
+os.environ['G_MESSAGES_DEBUG'] = 'none'
+
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
 
 # Le chemin où les fichiers médias sont stockés
 
@@ -138,6 +152,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Redirection après la connexion
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'bounamakountagoudiaby@gmail.com'
+EMAIL_HOST_PASSWORD = 'ngqjlxsfefxqtier'
+
+
 
 
 
