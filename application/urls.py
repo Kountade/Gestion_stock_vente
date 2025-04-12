@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import send_delivery_vente_email
+
 
 from . import views
 
@@ -70,10 +70,7 @@ urlpatterns = [
     path('ventes/modifier/<int:pk>/', views.modifier_vente, name='modifier_vente'),
     path('vente/<int:pk>/supprimer/', views.supprimer_vente, name='supprimer_vente'),
     path('vente/pdf/<int:vente_id>/', views.generate_delivery_vente_pdf, name='generate_delivery_vente_pdf'),
-    path('vente/<int:vente_id>/send-email/', views.send_delivery_vente_email, name='send_delivery_vente_email'),
-    path('api/send-pdf-email/', views.send_pdf_email_api, name='send_pdf_email_api'),
-
-
+   
     
        # ventes
       

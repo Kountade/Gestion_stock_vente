@@ -39,11 +39,11 @@
                 <p><strong>Date :</strong> {{ vente.date|date:"d/m/Y H:i" }}</p>
               </div>
               <div class="text-end">
-                <img src="{% static 'assets/img/logo.png' %}" alt="Logo" style="width: 120px" />
-                <p><strong>Votre entreprise</strong></p>
+                <img src="{% static 'assets/img/logo.png' %}" alt="Logo" style="width: 120px" crossorigin="anonymous" />
+                <p><strong>Galsenshop</strong></p>
                 <p>Adresse de l'entreprise</p>
-                <p>Téléphone : +212 6 12 34 56 78</p>
-                <p>Email : info@votreentreprise.com</p>
+                <p>Téléphone : +212 620-983-827</p>
+                <p>Email : techsinformatique@gmail.com</p>
               </div>
             </div>
 
@@ -59,21 +59,21 @@
             <!-- Produits vendus -->
             <h5 class="fw-bold mt-4">Détails des produits</h5>
             <table class="table table-bordered">
-              <thead class="table-primary">
+              <thead style="background-color: #34B7F1; color: white;">
                 <tr>
                   <th>Produit</th>
                   <th>Quantité</th>
-                  <th>Prix unitaire (€)</th>
-                  <th>Total (€)</th>
+                  <th>Prix unitaire (CFA)</th>
+                  <th>Total (CFA)</th>
                 </tr>
               </thead>
               <tbody>
                 {% for produit_vendu in produits_vendus %}
                 <tr>
                   <td>{{ produit_vendu.produit.nom }}</td>
-                  <td>{{ produit_vendu.quantite }}</td>
-                  <td>{{ produit_vendu.prix_unitaire|floatformat:2 }}</td>
-                  <td>{{ produit_vendu.total|floatformat:2 }}</td>
+                  <td style="text-align: center;">{{ produit_vendu.quantite }}</td>
+                  <td style="text-align: right;">{{ produit_vendu.prix_unitaire|floatformat:2 }}</td>
+                  <td style="text-align: right;">{{ produit_vendu.total|floatformat:2 }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -85,29 +85,61 @@
                 <table class="table table-bordered">
                   <tr>
                     <th>Sous-total</th>
-                    <td class="text-end">{{ vente_total|floatformat:2 }} €</td>
+                    <td class="text-end">{{ vente_total|floatformat:2 }} CFA</td>
                   </tr>
-                  <tr class="table-success">
-                    <th>Total à payer</th>
-                    <td class="text-end fw-bold">{{ vente_total|floatformat:2 }} €</td>
+                  <tr style="background-color: #4CAF50; color: white;">
+                    <th class="fw-bold">Total à payer</th>
+                    <td class="text-end fw-bold">{{ vente_total|floatformat:2 }} CFA</td>
                   </tr>
                 </table>
               </div>
             </div>
 
+            <!-- Informations supplémentaires -->
+            <div class="mt-4">
+              <h5 class="fw-bold">Informations supplémentaires</h5>
+              <table class="table table-bordered">
+                <thead style="background-color: #f44336; color: white;">
+                  <tr>
+                    <th>Statut Paiement</th>
+                    <th>Vendeur</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ vente.statut_paiement }}</td>
+                    <td>Non spécifié</td>
+                    <td>{{ vente.date|date:"d/m/Y H:i" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Signatures -->
+            <div class="signature-area mt-5">
+              <div class="signature-line">
+                <p>Signature du client</p>
+              </div>
+              <div class="signature-line">
+                <p>Signature Galsenshop</p>
+              </div>
+            </div>
+
             <!-- Boutons d'action -->
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between mt-4">
               <a href="{% url 'liste_ventes' %}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left-circle"></i> Retour à la liste
               </a>
-              <a href="{% url 'generate_delivery_vente_pdf' vente.id %}" class="btn btn-outline-success me-2" target="_blank">
-                <i class="bi bi-eye"></i> Voir la facture
-              </a>
-              <a href="{% url 'send_delivery_vente_email' vente.id %}" class="btn btn-primary">
-                <i class="bi bi-envelope"></i> Envoyer par email
-              </a>
+              <div>
+                <a href="{% url 'generate_delivery_vente_pdf' vente.id %}" class="btn btn-outline-success me-2" target="_blank">
+                  <i class="bi bi-eye"></i> Voir la facture
+                </a>
+                <a href="" class="btn btn-primary">
+                  <i class="bi bi-envelope"></i> Envoyer par email
+                </a>
+              </div>
             </div>
-            
 
           </div>
         </div>
@@ -133,14 +165,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const options = {
       scale: 2,
       useCORS: true,
-      logging: false,
+      logging: true,
+      allowTaint: true,
       scrollX: 0,
-      scrollY: -window.scrollY,
+      scrollY: 0,
       windowWidth: document.documentElement.scrollWidth,
       windowHeight: document.documentElement.scrollHeight
     };
 
-    exportBtn.innerHTML = '<i class="bi bi-hourglass"></i> Génération en cours...';
+    exportBtn.innerHTML = '<i class="bi bi-hourglass"></i> Génération...';
     exportBtn.disabled = true;
 
     html2canvas(element, options).then(canvas => {
@@ -151,17 +184,53 @@ document.addEventListener('DOMContentLoaded', function() {
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`facture_vente_{{ vente.id }}.pdf`);
-
-      exportBtn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Exporter en PDF';
+      pdf.save(`facture_${'{{ vente.id }}'}.pdf`);
+      
+      exportBtn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Télécharger PDF';
       exportBtn.disabled = false;
     }).catch(err => {
       console.error("Erreur lors de la génération du PDF:", err);
-      exportBtn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Erreur - Réessayer';
-      exportBtn.disabled = false;
+      exportBtn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Erreur';
+      setTimeout(() => {
+        exportBtn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Télécharger PDF';
+        exportBtn.disabled = false;
+      }, 2000);
     });
   }
 });
 </script>
 {% endblock %}
+
+<style>
+.signature-area {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 80px;
+}
+.signature-line {
+  width: 45%;
+  text-align: center;
+  border-top: 1px solid #000;
+  padding-top: 20px;
+}
+</style>
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

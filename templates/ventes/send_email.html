@@ -1,0 +1,79 @@
+<div id="pdf-content">
+  <!-- On réutilise le template de facture existant -->
+  {% include "ventes/vente_pdf_template.html" %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Génération automatique du PDF et envoi
+      generateAndSendPDF();
+  });
+
+  async function generateAndSendPDF() {
+      const element = document.getElementById('pdf-content');
+      const loader = document.createElement('div');
+      loader.innerHTML = `
+          <div style="position:fixed; top:0; left:0; width:100%; height:100%;
+          background:rgba(0,0,0,0.5); display:flex; justify-content:center;
+          align-items:center; z-index:1000;">
+              <div style="background:white; padding:20px; border-radius:5px;">
+                  Envoi de la facture en cours...
+              </div>
+          </div>
+      `;
+      document.body.appendChild(loader);
+
+      try {
+          // 1. Générer le PDF
+          const canvas = await html2canvas(element, {
+              scale: 1,  # Réduire l'échelle si nécessaire
+              useCORS: true,
+              logging: false,
+              allowTaint: true
+          });
+
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const imgWidth = 210;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+          pdf.addImage(canvas, 'PNG', 0, 0, imgWidth, imgHeight);
+
+          // 2. Convertir en base64 (méthode plus légère)
+          const pdfData = pdf.output('dataurlstring');
+
+          // 3. Envoyer au serveur
+          const response = await fetch('{% url "send_pdf_email" %}', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': '{{ csrf_token }}',
+              },
+              body: JSON.stringify({
+                  vente_id: '{{ vente.id }}',
+                  pdf_data: pdfData
+              })
+          });
+
+          if (!response.ok) {
+              throw new Error('Erreur réseau');
+          }
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+              window.location.href = "{% url 'detail_vente' pk=vente.id %}?sent=1";
+          } else {
+              throw new Error(result.message || "Erreur lors de l'envoi");
+          }
+      } catch (error) {
+          console.error("Erreur:", error);
+          alert("Erreur lors de l'envoi: " + error.message);
+      } finally {
+          document.body.removeChild(loader);
+      }
+  }
+</script>

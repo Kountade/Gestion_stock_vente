@@ -1,7 +1,9 @@
+import email
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+
 from .models import Fournisseur, Client, Contrat, Employe,Categorie, Stock, Vente, Client, VenteProduit,Produit
 from .forms import FournisseurForm, ClientForm, EmployeForm, ContratForm, ProduitForm,ProfileUpdateForm,UserUpdateForm
 from datetime import date
@@ -1154,87 +1156,4 @@ def generate_delivery_vente_pdf(request, vente_id):
         "produits_vendus": produits_vendus,
         "vente_total": vente_total,
     })
-
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-from django.http import HttpResponse, Http404
-from django.contrib import messages
-from django.shortcuts import redirect, get_object_or_404
-from django.db.models import Sum, F
-from .models import Vente
-
-
-# views.py
-from django.shortcuts import get_object_or_404, redirect
-from django.core.mail import EmailMessage
-from django.contrib import messages
-from django.template.loader import render_to_string
-from django.db.models import Sum, F
-from django.http import JsonResponse
-from .models import Vente
-import base64
-
-def send_delivery_vente_email(request, vente_id):
-    """Vue pour envoyer le bon de livraison au client par e-mail"""
-    # 1️⃣ Récupérer la vente
-    vente = get_object_or_404(Vente, pk=vente_id)
-    produits_vendus = vente.ventes_produits.all()
-
-    # 2️⃣ Calcul du total de chaque vente de produit
-    for produit_vendu in produits_vendus:
-        produit_vendu.total = produit_vendu.quantite * produit_vendu.prix_unitaire
-
-    # 3️⃣ Calcul du total global de la vente
-    vente_total = produits_vendus.aggregate(
-        total=Sum(F('quantite') * F('prix_unitaire'))
-    )['total'] or 0
-
-    # 4️⃣ Rendre le template HTML (qui contiendra le JS pour générer le PDF)
-    return render(request, 'ventes/vente_pdf_template.html', {
-        "vente": vente,
-        "produits_vendus": produits_vendus,
-        "vente_total": vente_total,
-    })
-
-def send_pdf_email_api(request):
-    """API endpoint pour recevoir le PDF généré et l'envoyer par email"""
-    if request.method == 'POST':
-        try:
-            # 1️⃣ Récupérer les données
-            vente_id = request.POST.get('vente_id')
-            pdf_data = request.POST.get('pdf_data')
-            vente = get_object_or_404(Vente, pk=vente_id)
-            
-            # 2️⃣ Décoder le PDF
-            pdf_content = base64.b64decode(pdf_data.split(',')[1])
-
-            # 3️⃣ Préparer l'email
-            subject = f"Bonjour merci pour votre achat. voici votre facture n°{vente.id}"
-            message = f"Veuillez trouver en pièce jointe le bon de livraison pour la vente n°{vente.id}."
-            
-            email = EmailMessage(
-                subject=subject,
-                body=message,
-                from_email='bounamakountagoudiaby@gmail.com',
-                to=[vente.client.email],
-            )
-
-            # 4️⃣ Attacher le PDF
-            email.attach(
-                f'facture_de_vente_{vente.id}.pdf', 
-                pdf_content, 
-                'application/pdf'
-            )
-
-            # 5️⃣ Envoyer l'email
-            email.send()
-            
-            return JsonResponse({'success': True})
-            
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    
-    return JsonResponse({'success': False, 'error': 'Méthode non autorisée'})
-
-
 
