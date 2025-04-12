@@ -286,58 +286,109 @@
                 </p>
             </div>
         </div>
-        
-        <!-- Boutons d'action (ne s'affichent pas dans l'impression/PDF) -->
-        <div class="action-buttons no-print">
+           <!-- Boutons d'action (ne s'affichent pas dans l'impression/PDF) -->
+           <div class="action-buttons no-print">
             <a href="{% url 'liste_livraisons' %}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left-circle"></i> Retour
             </a>
             <button id="pdf-export-btn" class="btn btn-success">
                 <i class="bi bi-file-earmark-pdf"></i> Exporter PDF
             </button>
-            <a href="#" onclick="window.print();" class="btn btn-primary">
+            <button id="send-email-btn" class="btn btn-primary">
+                <i class="bi bi-envelope"></i> Envoyer par email
+            </button>
+            <a href="#" onclick="window.print();" class="btn btn-info">
                 <i class="bi bi-printer"></i> Imprimer
             </a>
-            <a href="{% url 'modifier_vente' vente.id %}" class="btn btn-info">
+            <a href="{% url 'modifier_vente' vente.id %}" class="btn btn-warning">
                 <i class="bi bi-pencil-square"></i> Modifier
             </a>
         </div>
     </div>
 
-    <!-- Script pour l'export PDF -->
+    <!-- Script pour l'export PDF et envoi email -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-    document.getElementById('pdf-export-btn').addEventListener('click', function() {
-        // On cible uniquement la carte principale (sans les boutons)
+    // Initialisation de jsPDF
+    const { jsPDF } = window.jspdf;
+    
+    // Fonction pour générer le PDF
+    async function generatePDF() {
         const element = document.querySelector('.card');
+        const options = {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#FFFFFF'
+        };
+        
+        const canvas = await html2canvas(element, options);
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210; // Largeur A4 en mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        return pdf;
+    }
+
+    // Bouton Export PDF
+    document.getElementById('pdf-export-btn').addEventListener('click', async function() {
         const button = this;
         button.innerHTML = '<i class="bi bi-hourglass"></i> Génération...';
         button.disabled = true;
         
-        html2canvas(element, {
-            scale: 2,
-            useCORS: true,
-            logging: false
-        }).then(canvas => {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgData = canvas.toDataURL('image/png');
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        try {
+            const pdf = await generatePDF();
             pdf.save('facture_{{ vente.id }}.pdf');
+        } catch (error) {
+            console.error("Erreur:", error);
+            alert("Une erreur s'est produite lors de la génération du PDF");
+        } finally {
             button.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Exporter PDF';
             button.disabled = false;
-        }).catch(error => {
-            console.error("Erreur lors de la génération du PDF:", error);
-            button.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Erreur';
-            setTimeout(() => {
-                button.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Exporter PDF';
-                button.disabled = false;
-            }, 2000);
-        });
+        }
+    });
+
+    // Bouton Envoyer par email
+    document.getElementById('send-email-btn').addEventListener('click', async function() {
+        if (!confirm('Envoyer cette facture à {{ vente.client.email }} ?')) {
+            return;
+        }
+        
+        const button = this;
+        button.innerHTML = '<i class="bi bi-hourglass"></i> Envoi en cours...';
+        button.disabled = true;
+        
+        try {
+            const pdf = await generatePDF();
+            const pdfBlob = pdf.output('blob');
+            
+            // Création du FormData pour l'envoi
+            const formData = new FormData();
+            formData.append('pdf', pdfBlob, 'facture_{{ vente.id }}.pdf');
+            formData.append('vente_id', '{{ vente.id }}');
+            formData.append('email', '{{ vente.client.email }}');
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            
+            // Envoi au serveur
+            const response = await axios.post('/send_invoice_email/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+            
+            alert(response.data.message || 'Facture envoyée avec succès!');
+        } catch (error) {
+            console.error("Erreur:", error);
+            alert("Erreur lors de l'envoi: " + (error.response?.data?.error || error.message));
+        } finally {
+            button.innerHTML = '<i class="bi bi-envelope"></i> Envoyer par email';
+            button.disabled = false;
+        }
     });
     </script>
 </body>

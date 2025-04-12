@@ -70,6 +70,7 @@ urlpatterns = [
     path('ventes/modifier/<int:pk>/', views.modifier_vente, name='modifier_vente'),
     path('vente/<int:pk>/supprimer/', views.supprimer_vente, name='supprimer_vente'),
     path('vente/pdf/<int:vente_id>/', views.generate_delivery_vente_pdf, name='generate_delivery_vente_pdf'),
+     path('send_invoice_email/', views.send_invoice_email, name='send_invoice_email'),
    
     
        # ventes

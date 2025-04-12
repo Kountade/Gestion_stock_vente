@@ -1157,3 +1157,62 @@ def generate_delivery_vente_pdf(request, vente_id):
         "vente_total": vente_total,
     })
 
+
+
+from django.http import JsonResponse
+from django.core.mail import EmailMessage
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import os
+
+@csrf_exempt
+def send_invoice_email(request):
+    if request.method == 'POST':
+        try:
+            vente_id = request.POST.get('vente_id')
+            email_to = request.POST.get('email')
+            pdf_file = request.FILES['pdf']
+            
+            # Préparation de l'email
+            subject = f'Facture #{vente_id} - Galsenshop'
+            message = f"""
+            Bonjour,
+            
+            Vous trouverez ci-joint votre facture n°{vente_id}.
+            
+            Cordialement,
+            L'équipe Galsenshop
+            """
+            
+            email = EmailMessage(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email_to],
+            )
+            
+            # Attachement du PDF
+            email.attach(
+                f'facture_{vente_id}.pdf',
+                pdf_file.read(),
+                'application/pdf'
+            )
+            
+            # Envoi de l'email
+            email.send()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Facture envoyée avec succès!'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Méthode non autorisée'
+    }, status=405)
