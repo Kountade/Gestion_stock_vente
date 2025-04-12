@@ -1159,6 +1159,7 @@ def generate_delivery_vente_pdf(request, vente_id):
 
 
 
+
 from django.http import JsonResponse
 from django.core.mail import EmailMessage
 from django.views.decorators.csrf import csrf_exempt
