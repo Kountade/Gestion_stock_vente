@@ -1262,7 +1262,7 @@ def generer_ticket_pdf(request, vente_id):
     elements.append(Spacer(1, 6))
 
     # Tableau des produits vendus
-    table = Table(tableau_donnees, colWidths=[60, 30, 20, 30])
+    table = Table(tableau_donnees, colWidths=[80, 40, 20, 40])
     style = TableStyle([
         ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
         ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
