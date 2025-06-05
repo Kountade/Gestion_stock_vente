@@ -21,7 +21,6 @@ from django.http import HttpResponse, Http404
 from django.template.loader import render_to_string
 from .models import Livraison  # Remplacez par le modèle approprié
 from django.contrib.admin.models import LogEntry
-from .models import Client, Vente, VenteProduit, Categorie, Produit
 
 def home(request):
     # Période par défaut : Aujourd'hui
@@ -1217,3 +1216,71 @@ def send_invoice_email(request):
         'success': False,
         'error': 'Méthode non autorisée'
     }, status=405)
+    
+    
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.pagesizes import A7
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from datetime import datetime
+from django.db.models import F, Sum
+from .models import Vente
+
+def generer_ticket_pdf(request, vente_id):
+    # Récupération de la vente
+    vente = get_object_or_404(Vente, pk=vente_id)
+    produits_vendus = vente.ventes_produits.all()
+
+    # Calcul du total général
+    total_general = 0
+    tableau_donnees = [["Produit", "Prix", "Qté", "Total"]]
+    for item in produits_vendus:
+        total = item.quantite * item.prix_unitaire
+        total_general += total
+        tableau_donnees.append([
+            item.produit.nom,
+            f"{item.prix_unitaire:,.0f}",
+            str(item.quantite),
+            f"{total:,.0f}"
+        ])
+
+    # Configurer la réponse HTTP
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="ticket_vente_{vente.id}.pdf"'
+    pdf = SimpleDocTemplate(response, pagesize=A7, topMargin=5*mm, bottomMargin=5*mm, leftMargin=5*mm, rightMargin=5*mm)
+
+    styles = getSampleStyleSheet()
+    elements = []
+
+    # Informations du commerce
+    elements.append(Paragraph("<b>Ma Boutique</b>", styles["Title"]))
+    elements.append(Paragraph("Adresse ici - Tel: 77 123 45 67", styles["BodyText"]))
+    elements.append(Paragraph(datetime.now().strftime("%d/%m/%Y %H:%M"), styles["BodyText"]))
+    elements.append(Spacer(1, 6))
+
+    # Tableau des produits vendus
+    table = Table(tableau_donnees, colWidths=[60, 30, 20, 30])
+    style = TableStyle([
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTSIZE', (0, 0), (-1, -1), 7),
+    ])
+    table.setStyle(style)
+    elements.append(table)
+
+    # Total général
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f"<b>Total: {total_general:,.0f} CFA</b>", styles["Normal"]))
+
+    # Message de remerciement
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph("Merci pour votre achat !", styles["BodyText"]))
+    elements.append(Paragraph("À bientôt.", styles["BodyText"]))
+
+    # Générer le PDF
+    pdf.build(elements)
+    return response

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ticket #{{ vente.id }}</title>
+    <style>
+      body {
+        width: 80mm;
+        font-family: monospace;
+        font-size: 11px;
+        margin: 0;
+        padding: 5px;
+      }
+      .center {
+        text-align: center;
+      }
+      .right {
+        text-align: right;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 3px 0;
+        white-space: nowrap;
+      }
+      hr {
+        border: none;
+        border-top: 1px dashed #000;
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center">
+      <strong>🛍 GALSENSHOP</strong><br />
+      <small>{{ vente.date|date:"d/m/Y H:i" }}</small>
+    </div>
+
+    <hr />
+
+    <strong>Ticket #{{ vente.id }}</strong><br />
+    Client : {{ vente.client.nom|default:"-" }}
+
+    <hr />
+
+    <table>
+      <thead>
+        <tr>
+          <th>Article</th>
+          <th class="right">Qté</th>
+          <th class="right">Prix</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pv in produits_vendus %}
+        <tr>
+          <td>{{ pv.produit.nom|truncatechars:12 }}</td>
+          <td class="right">{{ pv.quantite }}</td>
+          <td class="right">{{ pv.prix_unitaire|floatformat:0 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <hr />
+
+    <div class="right">
+      <strong>Total: {{ vente_total|floatformat:0 }} CFA</strong>
+    </div>
+
+    <hr />
+
+    <div class="center">
+      Merci pour votre achat !<br />
+      <small>Contact : +221 XX XXX XX XX</small>
+    </div>
+
+    <script>
+      window.onload = function () {
+        setTimeout(() => {
+          window.print();
+          setTimeout(() => {
+            window.close();
+          }, 200);
+        }, 300);
+      };
+    </script>
+  </body>
+</html>

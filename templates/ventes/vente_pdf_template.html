@@ -2,374 +2,547 @@
 
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Facture #{{ vente.id }}</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
     <style>
-        /* Styles généraux */
+      /* Styles généraux */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      /* Styles des cartes */
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .card-header {
+        background-color: #34b7f1;
+        color: white;
+        padding: 15px 20px;
+        font-weight: bold;
+      }
+
+      .card-body {
+        padding: 25px;
+      }
+
+      .card-footer {
+        background-color: #f8f9fa;
+        padding: 15px 20px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+      }
+
+      /* Styles des tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      /* Styles spécifiques */
+      .client-card {
+        border: 1px solid #34b7f1;
+      }
+
+      .produits-card {
+        border: 2px solid #4caf50;
+      }
+
+      .infos-card {
+        border: 2px solid #f44336;
+      }
+
+      .signature-area {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+      }
+
+      .signature-line {
+        border-top: 1px solid #000;
+        padding-top: 40px;
+        width: 45%;
+        text-align: center;
+      }
+
+      /* Boutons (ne s'affichent pas dans l'impression/PDF) */
+      .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      .btn-success {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .btn-primary {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .btn-info {
+        background-color: #17a2b8;
+        color: white;
+      }
+
+      .btn-warning {
+        background-color: #ffc107;
+        color: black;
+      }
+
+      /* Styles pour l'impression */
+      @media print {
+        .no-print,
+        .no-print * {
+          display: none !important;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            color: #333;
+          padding: 0;
+          margin: 0;
         }
-        
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        /* Styles des cartes */
+
         .card {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            overflow: hidden;
+          box-shadow: none;
+          border: none;
+          margin: 0;
+          width: 100%;
         }
-        
+
         .card-header {
-            background-color: #34b7f1;
-            color: white;
-            padding: 15px 20px;
-            font-weight: bold;
+          border-radius: 0 !important;
         }
-        
-        .card-body {
-            padding: 25px;
+      }
+
+      /* Styles pour les notifications toast */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1100;
+      }
+
+      /* Animation pour les toasts */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
         }
-        
-        .card-footer {
-            background-color: #f8f9fa;
-            padding: 15px 20px;
-            border-top: 1px solid #ddd;
-            text-align: center;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        
-        /* Styles des tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        
-        /* Styles spécifiques */
-        .client-card {
-            border: 1px solid #34b7f1;
-        }
-        
-        .produits-card {
-            border: 2px solid #4caf50;
-        }
-        
-        .infos-card {
-            border: 2px solid #f44336;
-        }
-        
-        .signature-area {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 50px;
-        }
-        
-        .signature-line {
-            border-top: 1px solid #000;
-            padding-top: 40px;
-            width: 45%;
-            text-align: center;
-        }
-        
-        /* Boutons (ne s'affichent pas dans l'impression/PDF) */
-        .action-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .btn-info {
-            background-color: #17a2b8;
-            color: white;
-        }
-        
-        .btn-warning {
-            background-color: #ffc107;
-            color: black;
-        }
-        
-        /* Styles pour l'impression */
-        @media print {
-            .no-print, .no-print * {
-                display: none !important;
-            }
-            
-            body {
-                padding: 0;
-                margin: 0;
-            }
-            
-            .card {
-                box-shadow: none;
-                border: none;
-                margin: 0;
-                width: 100%;
-            }
-            
-            .card-header {
-                border-radius: 0 !important;
-            }
-        }
-        
-        /* Styles pour les notifications toast */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1100;
-        }
-        
-        /* Animation pour les toasts */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .toast.show {
-            animation: fadeIn 0.3s ease-out;
-        }
+      }
+
+      .toast.show {
+        animation: fadeIn 0.3s ease-out;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <!-- Carte principale contenant toute la facture -->
-        <div class="card">
-            <!-- En-tête -->
-            <div class="card-header" style="display: flex; align-items: center;">
-                <img src="{% static 'img/logo.png' %}" alt="Logo" style="height: 50px">
-                <div style="flex-grow: 1; text-align: center;">
-                    <h1 style="margin: 0; font-size: 24px;">Facture d'achat #{{ vente.id }}</h1>
-                </div>
-            </div>
-            
-            <!-- Corps de la facture -->
-            <div class="card-body">
-                <!-- Section Informations client/entreprise -->
-                <div style="display: flex; gap: 20px; margin-bottom: 20px;">
-                    <!-- Carte Client -->
-                    <div class="card client-card" style="flex: 1;">
-                        <div class="card-header">Informations du client</div>
-                        <div class="card-body">
-                            <p><strong>Nom Prénom :</strong> {{ vente.client.nom }} {{vente.client.prenom }}</p>
-                            <p><strong>Contact :</strong> {{vente.client.telephone }}</p>
-                            <p><strong>Email :</strong> {{ vente.client.email }}</p>
-                            <p><strong>Adresse :</strong> {{vente.client.adresse }}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Carte Entreprise -->
-                    <div class="card client-card" style="flex: 1;">
-                        <div class="card-header">Informations de Galsenshop</div>
-                        <div class="card-body">
-                            <p><strong>Nom de l'entreprise :</strong> Galsenshop</p>
-                            <p><strong>Adresse :</strong> Adresse de l'entreprise</p>
-                            <p><strong>Téléphone :</strong> +212 620-983-827</p>
-                            <p><strong>Email :</strong> techsinformatique@gmail.com</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Section Produits -->
-                <div class="card" style="border: 2px solid #4CAF50; border-radius: 5px; margin-bottom: 20px;">
-                    <div class="card-header" style="background-color: #4CAF50; color: white; padding: 12px; text-align: center;">
-                        <h3 style="margin: 0; font-weight: bold;">DÉTAILS DES PRODUITS</h3>
-                    </div>
-                    
-                    <div class="card-body" style="padding: 0;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead style="background-color: #34B7F1; color: white;">
-                                <tr>
-                                    <th style="padding: 12px; text-align: left; font-weight: bold; border-right: 1px solid #2A9FD8;">Produit</th>
-                                    <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #2A9FD8;">Quantité</th>
-                                    <th style="padding: 12px; text-align: right; font-weight: bold; border-right: 1px solid #2A9FD8;">Prix unitaire (cfa)</th>
-                                    <th style="padding: 12px; text-align: right; font-weight: bold;">Total (cfa)</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody>
-                                {% for produit_vendu in produits_vendus %}
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #E0E0E0;">{{ produit_vendu.produit.nom }}</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #E0E0E0; text-align: center;">{{ produit_vendu.quantite }}</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #E0E0E0; text-align: right;">{{ produit_vendu.prix_unitaire|floatformat:2 }}</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #E0E0E0; text-align: right;">{{ produit_vendu.total|floatformat:2 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            
-                            <tfoot style="background-color: #4CAF50; color: white;">
-                                <tr>
-                                    <td colspan="3" style="padding: 12px; text-align: right; font-weight: bold;">TOTAL GLOBAL</td>
-                                    <td style="padding: 12px; text-align: right; font-weight: bold;">{{ vente_total|floatformat:2 }} cfa</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Section Informations supplémentaires -->
-                <div class="card infos-card">
-                    <div class="card-header" style="background-color: #f44336; text-align: center;">
-                        Informations supplémentaires
-                    </div>
-                    <div class="card-body" style="padding: 0;">
-                        <table>
-                            <thead style="background-color: #ffebee; color: #f44336;">
-                                <tr>
-                                    <th>Référence</th>
-                                    <th>Date et heure</th>
-                                    <th>Statut client</th>
-                                    <th>Vendeur</th>
-                                    <th>Statut paiement</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{{ vente.id }}</td>
-                                    <td>{{ vente.date|date:"d/m/Y H:i" }}</td>
-                                    <td>Satisfait</td>
-                                    <td>Non spécifique</td>
-                                    <td>{{vente.statut_paiement}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Section Signatures -->
-                <div class="signature-area">
-                    <div class="signature-line">
-                        Signature du client
-                    </div>
-                    <div class="signature-line">
-                        Signature Galsenshop
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Pied de page -->
-            <div class="card-footer">
-                <p style="margin: 0; color: #6c757d;">
-                    Galsenshop • Adresse de l'entreprise • Tél: +212 620-983-827 • Email: techsinformatique@gmail.com
-                </p>
-                <p style="margin: 5px 0 0; color: #6c757d; font-size: 14px;">
-                    Facture générée le {% now "d/m/Y à H:i" %}
-                </p>
-            </div>
+      <!-- Carte principale contenant toute la facture -->
+      <div class="card">
+        <!-- En-tête -->
+        <div class="card-header" style="display: flex; align-items: center">
+          <img
+            src="{% static 'img/logo.png' %}"
+            alt="Logo"
+            style="height: 50px"
+          />
+          <div style="flex-grow: 1; text-align: center">
+            <h1 style="margin: 0; font-size: 24px">
+              Facture d'achat #{{ vente.id }}
+            </h1>
+          </div>
         </div>
-        
-        <!-- Boutons d'action (ne s'affichent pas dans l'impression/PDF) -->
+
+        <!-- Corps de la facture -->
+        <div class="card-body">
+          <!-- Section Informations client/entreprise -->
+          <div style="display: flex; gap: 20px; margin-bottom: 20px">
+            <!-- Carte Client -->
+            <div class="card client-card" style="flex: 1">
+              <div class="card-header">Informations du client</div>
+              <div class="card-body">
+                <p>
+                  <strong>Nom Prénom :</strong> {{ vente.client.nom }}
+                  {{vente.client.prenom }}
+                </p>
+                <p><strong>Contact :</strong> {{vente.client.telephone }}</p>
+                <p><strong>Email :</strong> {{ vente.client.email }}</p>
+                <p><strong>Adresse :</strong> {{vente.client.adresse }}</p>
+              </div>
+            </div>
+
+            <!-- Carte Entreprise -->
+            <div class="card client-card" style="flex: 1">
+              <div class="card-header">Informations de Galsenshop</div>
+              <div class="card-body">
+                <p><strong>Nom de l'entreprise :</strong> Galsenshop</p>
+                <p><strong>Adresse :</strong> Adresse de l'entreprise</p>
+                <p><strong>Téléphone :</strong> +212 620-983-827</p>
+                <p><strong>Email :</strong> techsinformatique@gmail.com</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Produits -->
+          <div
+            class="card"
+            style="
+              border: 2px solid #4caf50;
+              border-radius: 5px;
+              margin-bottom: 20px;
+            "
+          >
+            <div
+              class="card-header"
+              style="
+                background-color: #4caf50;
+                color: white;
+                padding: 12px;
+                text-align: center;
+              "
+            >
+              <h3 style="margin: 0; font-weight: bold">DÉTAILS DES PRODUITS</h3>
+            </div>
+
+            <div class="card-body" style="padding: 0">
+              <table style="width: 100%; border-collapse: collapse">
+                <thead style="background-color: #34b7f1; color: white">
+                  <tr>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: bold;
+                        border-right: 1px solid #2a9fd8;
+                      "
+                    >
+                      Produit
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: center;
+                        font-weight: bold;
+                        border-right: 1px solid #2a9fd8;
+                      "
+                    >
+                      Quantité
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: right;
+                        font-weight: bold;
+                        border-right: 1px solid #2a9fd8;
+                      "
+                    >
+                      Prix unitaire (cfa)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: right;
+                        font-weight: bold;
+                      "
+                    >
+                      Total (cfa)
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for produit_vendu in produits_vendus %}
+                  <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #e0e0e0">
+                      {{ produit_vendu.produit.nom }}
+                    </td>
+                    <td
+                      style="
+                        padding: 10px;
+                        border-bottom: 1px solid #e0e0e0;
+                        text-align: center;
+                      "
+                    >
+                      {{ produit_vendu.quantite }}
+                    </td>
+                    <td
+                      style="
+                        padding: 10px;
+                        border-bottom: 1px solid #e0e0e0;
+                        text-align: right;
+                      "
+                    >
+                      {{ produit_vendu.prix_unitaire|floatformat:2 }}
+                    </td>
+                    <td
+                      style="
+                        padding: 10px;
+                        border-bottom: 1px solid #e0e0e0;
+                        text-align: right;
+                      "
+                    >
+                      {{ produit_vendu.total|floatformat:2 }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+
+                <tfoot style="background-color: #4caf50; color: white">
+                  <tr>
+                    <td
+                      colspan="3"
+                      style="
+                        padding: 12px;
+                        text-align: right;
+                        font-weight: bold;
+                      "
+                    >
+                      TOTAL GLOBAL
+                    </td>
+                    <td
+                      style="
+                        padding: 12px;
+                        text-align: right;
+                        font-weight: bold;
+                      "
+                    >
+                      {{ vente_total|floatformat:2 }} cfa
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section Informations supplémentaires -->
+          <div class="card infos-card">
+            <div
+              class="card-header"
+              style="background-color: #f44336; text-align: center"
+            >
+              Informations supplémentaires
+            </div>
+            <div class="card-body" style="padding: 0">
+              <table>
+                <thead style="background-color: #ffebee; color: #f44336">
+                  <tr>
+                    <th>Référence</th>
+                    <th>Date et heure</th>
+                    <th>Statut client</th>
+                    <th>Vendeur</th>
+                    <th>Statut paiement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ vente.id }}</td>
+                    <td>{{ vente.date|date:"d/m/Y H:i" }}</td>
+                    <td>Satisfait</td>
+                    <td>Non spécifique</td>
+                    <td>{{vente.statut_paiement}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section Signatures -->
+          <div class="signature-area">
+            <div class="signature-line">Signature du client</div>
+            <div class="signature-line">Signature Galsenshop</div>
+          </div>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="card-footer">
+          <p style="margin: 0; color: #6c757d">
+            Galsenshop • Adresse de l'entreprise • Tél: +212 620-983-827 •
+            Email: techsinformatique@gmail.com
+          </p>
+          <p style="margin: 5px 0 0; color: #6c757d; font-size: 14px">
+            Facture générée le {% now "d/m/Y à H:i" %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Boutons d'action (ne s'affichent pas dans l'impression/PDF) -->
+      <div class="action-buttons no-print">
+        <a href="{% url 'liste_livraisons' %}" class="btn btn-secondary">
+          <i class="bi bi-arrow-left-circle"></i> Retour
+        </a>
         <div class="action-buttons no-print">
-            <a href="{% url 'liste_livraisons' %}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left-circle"></i> Retour
-            </a>
-            <button id="pdf-export-btn" class="btn btn-success">
-                <i class="bi bi-file-earmark-pdf"></i> Exporter PDF
-            </button>
-            <button id="send-email-btn" class="btn btn-primary">
-                <i class="bi bi-envelope"></i> Envoyer par email
-            </button>
-            <a href="#" onclick="window.print();" class="btn btn-info">
-                <i class="bi bi-printer"></i> Imprimer
-            </a>
-            <a href="{% url 'modifier_vente' vente.id %}" class="btn btn-warning">
-                <i class="bi bi-pencil-square"></i> Modifier
-            </a>
+          <a
+            href="{% url 'generer_ticket_pdf' vente.id %}"
+            class="btn btn-success"
+            target="_blank"
+          >
+            🧾 Imprimer le ticket
+          </a>
         </div>
+        <button id="pdf-export-btn" class="btn btn-success">
+          <i class="bi bi-file-earmark-pdf"></i> Exporter PDF
+        </button>
+        <button id="send-email-btn" class="btn btn-primary">
+          <i class="bi bi-envelope"></i> Envoyer par email
+        </button>
+        <a href="#" onclick="window.print();" class="btn btn-info">
+          <i class="bi bi-printer"></i> Imprimer
+        </a>
+
+        <a href="{% url 'modifier_vente' vente.id %}" class="btn btn-warning">
+          <i class="bi bi-pencil-square"></i> Modifier
+        </a>
+      </div>
     </div>
 
     <!-- Modal de confirmation d'envoi -->
-    <div class="modal fade" id="emailConfirmationModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmation d'envoi</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Envoyer cette facture à <strong>{{ vente.client.email }}</strong> ?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary" id="confirm-send-email">Confirmer l'envoi</button>
-                </div>
-            </div>
+    <div
+      class="modal fade"
+      id="emailConfirmationModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmation d'envoi</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Envoyer cette facture à
+              <strong>{{ vente.client.email }}</strong> ?
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="confirm-send-email"
+            >
+              Confirmer l'envoi
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Container pour les notifications toast -->
     <div class="toast-container">
-        <div class="toast align-items-center text-white bg-success" id="successToast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    <span id="successMessage">Facture envoyée avec succès!</span>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
+      <div
+        class="toast align-items-center text-white bg-success"
+        id="successToast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span id="successMessage">Facture envoyée avec succès!</span>
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
-        
-        <div class="toast align-items-center text-white bg-danger" id="errorToast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <span id="errorMessage">Erreur lors de l'envoi!</span>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
+      </div>
+
+      <div
+        class="toast align-items-center text-white bg-danger"
+        id="errorToast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="errorMessage">Erreur lors de l'envoi!</span>
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
+      </div>
     </div>
 
     <!-- Scripts JS -->
@@ -378,106 +551,131 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-    // Initialisation des composants Bootstrap
-    const emailModal = new bootstrap.Modal(document.getElementById('emailConfirmationModal'));
-    const successToast = new bootstrap.Toast(document.getElementById('successToast'));
-    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
-    
-    // Initialisation de jsPDF
-    const { jsPDF } = window.jspdf;
-    
-    // Fonction pour générer le PDF
-    async function generatePDF() {
-        const element = document.querySelector('.card');
+      // Initialisation des composants Bootstrap
+      const emailModal = new bootstrap.Modal(
+        document.getElementById("emailConfirmationModal")
+      );
+      const successToast = new bootstrap.Toast(
+        document.getElementById("successToast")
+      );
+      const errorToast = new bootstrap.Toast(
+        document.getElementById("errorToast")
+      );
+
+      // Initialisation de jsPDF
+      const { jsPDF } = window.jspdf;
+
+      // Fonction pour générer le PDF
+      async function generatePDF() {
+        const element = document.querySelector(".card");
         const options = {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#FFFFFF'
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#FFFFFF",
         };
-        
+
         const canvas = await html2canvas(element, options);
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
         const imgWidth = 210; // Largeur A4 en mm
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
         return pdf;
-    }
+      }
 
-    // Bouton Export PDF
-    document.getElementById('pdf-export-btn').addEventListener('click', async function() {
-        const button = this;
-        button.innerHTML = '<i class="bi bi-hourglass"></i> Génération...';
-        button.disabled = true;
-        
-        try {
+      // Bouton Export PDF
+      document
+        .getElementById("pdf-export-btn")
+        .addEventListener("click", async function () {
+          const button = this;
+          button.innerHTML = '<i class="bi bi-hourglass"></i> Génération...';
+          button.disabled = true;
+
+          try {
             const pdf = await generatePDF();
-            pdf.save('facture_{{ vente.id }}.pdf');
-            
+            pdf.save("facture_{{ vente.id }}.pdf");
+
             // Afficher un toast de succès
-            document.getElementById('successMessage').textContent = "PDF généré avec succès!";
+            document.getElementById("successMessage").textContent =
+              "PDF généré avec succès!";
             successToast.show();
-        } catch (error) {
+          } catch (error) {
             console.error("Erreur:", error);
-            document.getElementById('errorMessage').textContent = "Erreur lors de la génération du PDF";
+            document.getElementById("errorMessage").textContent =
+              "Erreur lors de la génération du PDF";
             errorToast.show();
-        } finally {
-            button.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Exporter PDF';
+          } finally {
+            button.innerHTML =
+              '<i class="bi bi-file-earmark-pdf"></i> Exporter PDF';
             button.disabled = false;
-        }
-    });
+          }
+        });
 
-    // Bouton Envoyer par email - Ouvre la modal
-    document.getElementById('send-email-btn').addEventListener('click', function() {
-        emailModal.show();
-    });
+      // Bouton Envoyer par email - Ouvre la modal
+      document
+        .getElementById("send-email-btn")
+        .addEventListener("click", function () {
+          emailModal.show();
+        });
 
-    // Confirmation d'envoi dans la modal
-    document.getElementById('confirm-send-email').addEventListener('click', async function() {
-        emailModal.hide();
-        
-        const button = document.getElementById('send-email-btn');
-        button.innerHTML = '<i class="bi bi-hourglass"></i> Envoi en cours...';
-        button.disabled = true;
-        
-        try {
+      // Confirmation d'envoi dans la modal
+      document
+        .getElementById("confirm-send-email")
+        .addEventListener("click", async function () {
+          emailModal.hide();
+
+          const button = document.getElementById("send-email-btn");
+          button.innerHTML =
+            '<i class="bi bi-hourglass"></i> Envoi en cours...';
+          button.disabled = true;
+
+          try {
             const pdf = await generatePDF();
-            const pdfBlob = pdf.output('blob');
-            
+            const pdfBlob = pdf.output("blob");
+
             // Création du FormData pour l'envoi
             const formData = new FormData();
-            formData.append('pdf', pdfBlob, 'facture_{{ vente.id }}.pdf');
-            formData.append('vente_id', '{{ vente.id }}');
-            formData.append('email', '{{ vente.client.email }}');
-            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-            
+            formData.append("pdf", pdfBlob, "facture_{{ vente.id }}.pdf");
+            formData.append("vente_id", "{{ vente.id }}");
+            formData.append("email", "{{ vente.client.email }}");
+            formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
             // Envoi au serveur
-            const response = await axios.post('/send_invoice_email/', formData, {
+            const response = await axios.post(
+              "/send_invoice_email/",
+              formData,
+              {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
-            
+                  "Content-Type": "multipart/form-data",
+                  "X-CSRFToken": "{{ csrf_token }}",
+                },
+              }
+            );
+
             // Affichage du message de succès
             if (response.data.success) {
-                document.getElementById('successMessage').textContent = response.data.message || 'Facture envoyée avec succès!';
-                successToast.show();
+              document.getElementById("successMessage").textContent =
+                response.data.message || "Facture envoyée avec succès!";
+              successToast.show();
             } else {
-                throw new Error(response.data.error || 'Erreur inconnue');
+              throw new Error(response.data.error || "Erreur inconnue");
             }
-        } catch (error) {
+          } catch (error) {
             console.error("Erreur:", error);
-            document.getElementById('errorMessage').textContent = "Erreur lors de l'envoi: " + 
-                (error.response?.data?.error || error.message || 'Erreur inconnue');
+            document.getElementById("errorMessage").textContent =
+              "Erreur lors de l'envoi: " +
+              (error.response?.data?.error ||
+                error.message ||
+                "Erreur inconnue");
             errorToast.show();
-        } finally {
-            button.innerHTML = '<i class="bi bi-envelope"></i> Envoyer par email';
+          } finally {
+            button.innerHTML =
+              '<i class="bi bi-envelope"></i> Envoyer par email';
             button.disabled = false;
-        }
-    });
+          }
+        });
     </script>
-</body>
+  </body>
 </html>

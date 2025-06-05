@@ -67,9 +67,13 @@ urlpatterns = [
     path('ajouter-vente/', views.ajouter_vente, name='ajouter_vente'),  # Ajouter une nouvelle vente
     path('liste-ventes/', views.liste_ventes, name='liste_ventes'),    # Voir la liste des ventes
     path('detail-vente/<int:pk>/', views.detail_vente, name='detail_vente'),
+    
     path('ventes/modifier/<int:pk>/', views.modifier_vente, name='modifier_vente'),
     path('vente/<int:pk>/supprimer/', views.supprimer_vente, name='supprimer_vente'),
     path('vente/pdf/<int:vente_id>/', views.generate_delivery_vente_pdf, name='generate_delivery_vente_pdf'),
+    # urls.py
+    path("ticket/vente/<int:vente_id>/", views.generer_ticket_pdf, name="generer_ticket_pdf"),
+
      path('send_invoice_email/', views.send_invoice_email, name='send_invoice_email'),
    
     
