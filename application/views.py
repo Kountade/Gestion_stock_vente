@@ -1284,3 +1284,15 @@ def generer_ticket_pdf(request, vente_id):
     # Générer le PDF
     pdf.build(elements)
     return response
+
+
+
+
+
+
+
+def custom_404_view(request, exception):
+    """
+    Vue personnalisée pour la page 404.
+    """
+    return render(request, '404.html', status=404)
